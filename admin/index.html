@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard — PortfolioKit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<style>
+:root{--bg:#04080f;--bg1:#080f1c;--bg2:#0c1528;--card:rgba(12,21,44,.9);--cyan:#00d4ff;--orange:#ff6b35;--green:#22c55e;--red:#ef4444;--purple:#a78bfa;--gold:#ffd700;--text:#e6edf3;--muted:#8b949e;--dim:#3d4450;--border:rgba(0,212,255,.12);--g1:linear-gradient(135deg,#00d4ff,#0088bb);--r:12px;--ease:all .25s ease}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--cyan);border-radius:2px}
+a{text-decoration:none;color:inherit}
+.topbar{height:66px;background:var(--bg1);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100}
+.tb-logo{font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:800;background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tb-right{display:flex;align-items:center;gap:.85rem}
+.user-chip{display:flex;align-items:center;gap:.55rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:50px;padding:.3rem .85rem .3rem .3rem}
+.user-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,rgba(0,212,255,.2),rgba(255,107,53,.15));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--cyan);font-family:'Space Grotesk',sans-serif}
+.user-email{font-size:.78rem;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:.42rem;padding:.5rem 1.15rem;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;transition:var(--ease);border:none;font-family:inherit}
+.btn-p{background:var(--g1);color:#fff}.btn-p:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(0,212,255,.3)}
+.btn-s{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border)}.btn-s:hover{border-color:var(--cyan);color:var(--text)}
+.btn-d{background:rgba(239,68,68,.07);color:var(--red);border:1px solid rgba(239,68,68,.18)}.btn-d:hover{background:rgba(239,68,68,.14)}
+.main{max-width:1000px;margin:0 auto;padding:2.5rem 2rem}
+.greeting{margin-bottom:2.5rem}
+.greeting h1{font-family:'Space Grotesk',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-.5px;margin-bottom:.35rem}
+.greeting h1 span{background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.greeting p{color:var(--muted);font-size:.92rem}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem}
+.stat-c{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.4rem}
+.stat-n{font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:800;color:var(--cyan);line-height:1;display:block}
+.stat-l{font-size:.76rem;color:var(--muted);margin-top:.3rem;text-transform:uppercase;letter-spacing:.5px}
+.section-title{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:1.1rem}
+/* Portfolio card */
+.portfolio-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:var(--ease);margin-bottom:2rem}
+.portfolio-card:hover{border-color:rgba(0,212,255,.3);box-shadow:0 16px 50px rgba(0,0,0,.4)}
+.pc-header{background:linear-gradient(135deg,rgba(0,212,255,.06),rgba(255,107,53,.04));padding:1.8rem 2rem;display:flex;align-items:center;gap:1.5rem;border-bottom:1px solid var(--border)}
+.pc-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid var(--border);flex-shrink:0;background:var(--bg2)}
+.pc-initials{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(255,107,53,.1));border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:800;color:var(--cyan);flex-shrink:0}
+.pc-info{flex:1;min-width:0}
+.pc-name{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:.2rem}
+.pc-headline{font-size:.88rem;color:var(--muted);margin-bottom:.6rem}
+.pc-link{display:inline-flex;align-items:center;gap:.4rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--cyan);background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.18);padding:.22rem .75rem;border-radius:50px;transition:var(--ease)}
+.pc-link:hover{background:rgba(0,212,255,.14)}
+.pc-actions{display:flex;flex-direction:column;gap:.6rem;flex-shrink:0}
+.pc-body{padding:1.6rem 2rem}
+.pc-sections{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.6rem}
+.ps-item{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:9px;padding:.8rem;text-align:center;transition:var(--ease)}
+.ps-item.filled{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.04)}
+.ps-ico{font-size:.9rem;color:var(--dim);margin-bottom:.3rem}.ps-item.filled .ps-ico{color:var(--cyan)}
+.ps-name{font-size:.68rem;color:var(--dim);font-weight:500}.ps-item.filled .ps-name{color:var(--muted)}
+.ps-count{font-size:.62rem;color:var(--cyan);font-family:'JetBrains Mono',monospace;margin-top:.1rem}
+.pc-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--dim)}
+.pc-updated{display:flex;align-items:center;gap:.4rem}
+.copy-btn{display:flex;align-items:center;gap:.4rem;color:var(--muted);cursor:pointer;transition:var(--ease);background:none;border:none;font-family:inherit;font-size:.8rem;padding:.3rem .7rem;border-radius:6px;border:1px solid var(--border)}
+.copy-btn:hover{color:var(--cyan);border-color:var(--cyan)}
+/* Setup card */
+.setup-card{background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.18);border-radius:var(--r);padding:1.4rem 1.6rem;margin-bottom:2rem}
+.setup-card h3{font-family:'Space Grotesk',sans-serif;font-size:.98rem;font-weight:700;color:var(--gold);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.setup-card p{font-size:.85rem;color:var(--muted);line-height:1.7}
+.setup-card code{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:.82rem}
+/* Loading */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:1rem;color:var(--muted)}
+.spinner{width:38px;height:38px;border-radius:50%;border:3px solid rgba(0,212,255,.15);border-top-color:var(--cyan);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Toast */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg1);border:1px solid var(--border);border-radius:10px;padding:.75rem 1.2rem;font-size:.85rem;display:flex;align-items:center;gap:.6rem;box-shadow:0 10px 40px rgba(0,0,0,.5);z-index:900;transform:translateY(16px);opacity:0;transition:var(--ease);pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}.toast.ok i{color:var(--green)}.toast.err i{color:var(--red)}
+@media(max-width:640px){.stats-row{grid-template-columns:1fr 1fr}.pc-sections{grid-template-columns:repeat(2,1fr)}.pc-header{flex-direction:column;align-items:flex-start}.pc-actions{flex-direction:row}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="tb-logo">PortfolioKit</span>
+  <div class="tb-right">
+    <div class="user-chip">
+      <div class="user-av" id="user-av">?</div>
+      <span class="user-email" id="user-email">Loading…</span>
+    </div>
+    <button class="btn btn-s" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Log out</button>
+  </div>
+</header>
+
+<main class="main" id="main">
+  <div class="loading"><div class="spinner"></div><span>Loading your portfolio…</span></div>
+</main>
+
+<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toast-msg"></span></div>
+
+<script>
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function init() {
+  const { data: { session } } = await supa.auth.getSession();
+  if (!session) return window.location.href = '/login.html';
+
+  const user = session.user;
+  const initials = (user.user_metadata?.full_name || user.email || '?')
+    .split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  document.getElementById('user-av').textContent    = initials;
+  document.getElementById('user-email').textContent = user.email;
+
+  const { data: row, error } = await supa
+    .from('portfolios')
+    .select('slug, data, updated_at')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (error) {
+    document.getElementById('main').innerHTML =
+      `<p style="color:var(--red);padding:3rem;text-align:center">${esc(error.message)}</p>`;
+    return;
+  }
+
+  if (!row) {
+    // Portfolio row missing (edge case — redirect to signup shouldn't happen normally)
+    document.getElementById('main').innerHTML = `
+      <div class="setup-card">
+        <h3><i class="fas fa-triangle-exclamation"></i> Portfolio not found</h3>
+        <p>Your portfolio data wasn't created. This can happen if sign-up was interrupted.
+        Please <a href="/signup.html" style="color:var(--cyan)">sign up again</a> or contact support.</p>
+      </div>`;
+    return;
+  }
+
+  renderDashboard(user, row);
+}
+
+function renderDashboard(user, row) {
+  const d    = row.data || {};
+  const p    = d.profile || {};
+  const slug = row.slug;
+  const publicUrl = `${location.origin}/portfolio/${slug}`;
+  const updated   = new Date(row.updated_at);
+
+  const sections = [
+    { icon: 'fas fa-folder-open',      name: 'Projects',      count: (d.projects||[]).length },
+    { icon: 'fas fa-graduation-cap',   name: 'Education',     count: (d.education||[]).length },
+    { icon: 'fas fa-sliders',          name: 'Skills',        count: (d.skills?.core||[]).length + (d.skills?.computational||[]).length },
+    { icon: 'fas fa-certificate',      name: 'Certs',         count: (d.certifications||[]).length },
+    { icon: 'fas fa-trophy',           name: 'Awards',        count: (d.honours||[]).length },
+    { icon: 'fas fa-book-open',        name: 'Publications',  count: (d.publications||[]).length },
+    { icon: 'fas fa-lightbulb',        name: 'Patents',       count: (d.patents||[]).length },
+    { icon: 'fas fa-hands-helping',    name: 'Volunteer',     count: (d.volunteer||[]).length },
+  ];
+  const totalItems = sections.reduce((a,s)=>a+s.count,0);
+
+  const photoHtml = p.photo
+    ? `<img class="pc-avatar" src="${esc(p.photo)}" alt="${esc(p.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const initialsEl = `<div class="pc-initials" ${p.photo?'style="display:none"':''}>${esc(p.initials||'??')}</div>`;
+
+  const sectionCards = sections.map(s => `
+    <div class="ps-item${s.count>0?' filled':''}">
+      <div class="ps-ico"><i class="${s.icon}"></i></div>
+      <div class="ps-name">${s.name}</div>
+      ${s.count>0?`<div class="ps-count">${s.count}</div>`:''}
+    </div>`).join('');
+
+  const completionPct = Math.min(100, Math.round(
+    (p.name?10:0) + (p.photo?10:0) + ((d.projects||[]).length>0?15:0) +
+    ((d.skills?.core||[]).length>0?15:0) + ((d.education||[]).length>0?15:0) +
+    ((d.certifications||[]).length>0?10:0) + (p.about?.paragraphs?.length>0?15:0) +
+    ((d.contact?.email)?10:0)
+  ));
+
+  document.getElementById('main').innerHTML = `
+    <div class="greeting">
+      <h1>Welcome back, <span>${esc((p.name||user.email).split(' ')[0])}</span> 👋</h1>
+      <p>Your portfolio is live. Last saved ${relTime(updated)}.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-c">
+        <span class="stat-n">${completionPct}%</span>
+        <div class="stat-l">Profile Complete</div>
+      </div>
+      <div class="stat-c">
+        <span class="stat-n" style="color:var(--orange)">${totalItems}</span>
+        <div class="stat-l">Total Items</div>
+      </div>
+      <div class="stat-c">
+        <span class="stat-n" style="color:var(--purple)">${sections.filter(s=>s.count>0).length}</span>
+        <div class="stat-l">Sections Filled</div>
+      </div>
+      <div class="stat-c">
+        <span class="stat-n" style="color:var(--green)">Live</span>
+        <div class="stat-l">Portfolio Status</div>
+      </div>
+    </div>
+
+    <div class="section-title">Your Portfolio</div>
+    <div class="portfolio-card">
+      <div class="pc-header">
+        ${photoHtml}${initialsEl}
+        <div class="pc-info">
+          <div class="pc-name">${esc(p.name||'Unnamed Portfolio')}</div>
+          <div class="pc-headline">${esc(p.headline||'No headline set')}</div>
+          <a href="${esc(publicUrl)}" target="_blank" class="pc-link">
+            <i class="fas fa-arrow-up-right-from-square"></i>
+            /portfolio/${esc(slug)}
+          </a>
+        </div>
+        <div class="pc-actions">
+          <a href="/admin/edit" class="btn btn-p"><i class="fas fa-pen"></i> Edit Portfolio</a>
+          <a href="${esc(publicUrl)}" target="_blank" class="btn btn-s"><i class="fas fa-eye"></i> View Live</a>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-sections">${sectionCards}</div>
+        <div class="pc-meta">
+          <span class="pc-updated"><i class="fas fa-clock"></i> Last saved: ${updated.toLocaleString()}</span>
+          <button class="copy-btn" onclick="copyLink('${esc(publicUrl)}')">
+            <i class="fas fa-copy"></i> Copy public link
+          </button>
+        </div>
+      </div>
+    </div>
+
+    ${completionPct < 70 ? `
+    <div class="setup-card">
+      <h3><i class="fas fa-wand-magic-sparkles"></i> Finish setting up your portfolio (${completionPct}% complete)</h3>
+      <p>Add your projects, skills, and education to make your portfolio stand out.
+      Click <strong>Edit Portfolio</strong> above to fill in all sections.</p>
+    </div>` : ''}
+  `;
+}
+
+function relTime(d) {
+  const diff = Date.now() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1)  return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return `${hrs}h ago`;
+  return d.toLocaleDateString();
+}
+
+function copyLink(url) {
+  navigator.clipboard.writeText(url).then(() => toast('Link copied to clipboard!', 'ok'));
+}
+
+async function logout() {
+  await supa.auth.signOut();
+  window.location.href = '/login.html';
+}
+
+let toastTimer;
+function toast(msg, type = 'ok') {
+  clearTimeout(toastTimer);
+  const el = document.getElementById('toast');
+  el.querySelector('i').className = type === 'ok' ? 'fas fa-circle-check' : 'fas fa-circle-xmark';
+  el.className = `toast ${type} show`;
+  document.getElementById('toast-msg').textContent = msg;
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+init();
+</script>
+</body>
+</html>

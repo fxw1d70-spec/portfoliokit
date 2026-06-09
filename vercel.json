@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/portfolio/:slug", "destination": "/portfolio.html?slug=:slug" },
+    { "source": "/admin/edit",      "destination": "/admin/edit.html"           }
+  ]
+}

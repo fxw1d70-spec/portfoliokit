@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sign In — PortfolioKit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<style>
+:root{--bg:#04080f;--bg1:#080f1c;--bg2:#0c1528;--cyan:#00d4ff;--orange:#ff6b35;--green:#22c55e;--red:#ef4444;--text:#e6edf3;--muted:#8b949e;--dim:#3d4450;--border:rgba(0,212,255,.12);--g1:linear-gradient(135deg,#00d4ff,#0088bb);--r:12px;--ease:all .25s ease}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(130px);pointer-events:none}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(0,212,255,.09),transparent 70%);top:-150px;right:-100px}
+.orb2{width:350px;height:350px;background:radial-gradient(circle,rgba(255,107,53,.08),transparent 70%);bottom:-100px;left:-50px}
+.card{background:rgba(8,15,28,.95);border:1px solid var(--border);border-radius:20px;padding:2.6rem;width:100%;max-width:420px;position:relative;z-index:1;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:800;background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.8rem;display:block}
+.card-title{font-family:'Space Grotesk',sans-serif;font-size:1.65rem;font-weight:800;letter-spacing:-.5px;margin-bottom:.4rem}
+.card-sub{font-size:.875rem;color:var(--muted);margin-bottom:2rem;line-height:1.6}
+.fg{margin-bottom:1.3rem}
+.fg label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px}
+.inp-wrap{position:relative}
+.inp-wrap i{position:absolute;left:.95rem;top:50%;transform:translateY(-50%);color:var(--dim);font-size:.82rem;pointer-events:none}
+.inp-wrap input{width:100%;padding:.78rem 1rem .78rem 2.5rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:.9rem;outline:none;transition:var(--ease)}
+.inp-wrap input:focus{border-color:var(--cyan);background:rgba(0,212,255,.025);box-shadow:0 0 0 3px rgba(0,212,255,.08)}
+.inp-wrap input::placeholder{color:var(--dim)}
+.inp-wrap .toggle-pw{position:absolute;right:.9rem;top:50%;transform:translateY(-50%);color:var(--dim);cursor:pointer;font-size:.82rem;transition:var(--ease)}
+.inp-wrap .toggle-pw:hover{color:var(--cyan)}
+.btn-submit{width:100%;padding:.9rem;background:var(--g1);color:#fff;border:none;border-radius:9px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:var(--ease);display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:.4rem}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,212,255,.35)}
+.btn-submit:disabled{opacity:.6;pointer-events:none}
+.divider{display:flex;align-items:center;gap:.8rem;margin:1.4rem 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider span{font-size:.76rem;color:var(--dim)}
+.err-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:.75rem 1rem;font-size:.84rem;color:var(--red);margin-bottom:1.2rem;display:none}
+.err-box.show{display:block}
+.footer-text{text-align:center;margin-top:1.5rem;font-size:.84rem;color:var(--muted)}
+.footer-text a{color:var(--cyan);font-weight:600;transition:var(--ease)}.footer-text a:hover{text-decoration:underline}
+.back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--dim);margin-bottom:1.5rem;transition:var(--ease)}.back-link:hover{color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="card">
+  <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to home</a>
+  <span class="logo">PortfolioKit</span>
+  <div class="card-title">Welcome back</div>
+  <div class="card-sub">Sign in to edit and manage your portfolio.</div>
+
+  <div class="err-box" id="err-box"><i class="fas fa-circle-xmark"></i> <span id="err-msg"></span></div>
+
+  <form id="login-form">
+    <div class="fg">
+      <label>Email</label>
+      <div class="inp-wrap">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Password</label>
+      <div class="inp-wrap">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+        <span class="toggle-pw" onclick="togglePw()"><i class="fas fa-eye" id="pw-eye"></i></span>
+      </div>
+    </div>
+    <button type="submit" class="btn-submit" id="submit-btn">
+      <i class="fas fa-sign-in-alt"></i> Sign In
+    </button>
+  </form>
+
+  <p class="footer-text">Don't have an account? <a href="/signup.html">Create one free</a></p>
+</div>
+
+<script>
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Redirect if already logged in
+supa.auth.getSession().then(({ data: { session } }) => {
+  if (session) window.location.href = '/admin';
+});
+
+function togglePw() {
+  const inp = document.getElementById('password');
+  const ico = document.getElementById('pw-eye');
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  ico.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+}
+
+function showErr(msg) {
+  const box = document.getElementById('err-box');
+  document.getElementById('err-msg').textContent = msg;
+  box.classList.add('show');
+}
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing in…';
+  document.getElementById('err-box').classList.remove('show');
+
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  const { error } = await supa.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    showErr(error.message);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+  } else {
+    btn.innerHTML = '<i class="fas fa-check"></i> Signed in! Redirecting…';
+    setTimeout(() => window.location.href = '/admin', 600);
+  }
+});
+</script>
+</body>
+</html>
