@@ -116,17 +116,118 @@ async function init() {
   }
 
   if (!row) {
-    // Portfolio row missing (edge case — redirect to signup shouldn't happen normally)
-    document.getElementById('main').innerHTML = `
-      <div class="setup-card">
-        <h3><i class="fas fa-triangle-exclamation"></i> Portfolio not found</h3>
-        <p>Your portfolio data wasn't created. This can happen if sign-up was interrupted.
-        Please <a href="/signup.html" style="color:var(--cyan)">sign up again</a> or contact support.</p>
-      </div>`;
+    showSetupForm(user);
     return;
   }
 
   renderDashboard(user, row);
+}
+
+function showSetupForm(user) {
+  const name = user.user_metadata?.full_name || '';
+  document.getElementById('main').innerHTML = `
+    <div class="greeting">
+      <h1>One last step, <span>${esc(name.split(' ')[0] || 'there')}</span> 👋</h1>
+      <p>Choose your portfolio slug — this becomes your permanent public URL.</p>
+    </div>
+    <div style="max-width:480px">
+      <div style="margin-bottom:1.2rem">
+        <label style="display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px">Your Portfolio Slug</label>
+        <div style="position:relative">
+          <input id="setup-slug" type="text" placeholder="e.g. skepa-masimba" maxlength="58"
+            style="width:100%;padding:.78rem 2.5rem .78rem 1rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:.9rem;outline:none"
+            oninput="onSetupSlug(this)">
+          <span id="setup-status" style="position:absolute;right:.9rem;top:50%;transform:translateY(-50%);font-size:.82rem"></span>
+        </div>
+        <div id="setup-hint" style="font-size:.73rem;color:var(--dim);margin-top:.38rem">Only lowercase letters, numbers, and hyphens.</div>
+        <div id="setup-url" style="display:none;margin-top:.5rem;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:8px;padding:.6rem .9rem;font-size:.8rem;color:var(--muted);font-family:'JetBrains Mono',monospace">
+          Your link: <span id="setup-url-val" style="color:var(--cyan)"></span>
+        </div>
+      </div>
+      <button id="setup-btn" class="btn btn-p" style="width:100%;justify-content:center;padding:.85rem;font-size:.95rem" onclick="createPortfolio('${esc(user.id)}','${esc(name)}')">
+        <i class="fas fa-rocket"></i> Set Up My Portfolio
+      </button>
+    </div>`;
+
+  let slugOk = false, checkTimer = null;
+
+  window.onSetupSlug = function(inp) {
+    const clean = inp.value.toLowerCase().replace(/[^a-z0-9-]/g,'');
+    if (inp.value !== clean) inp.value = clean;
+    const hint = document.getElementById('setup-hint');
+    const status = document.getElementById('setup-status');
+    const urlBox = document.getElementById('setup-url');
+    const urlVal = document.getElementById('setup-url-val');
+    slugOk = false;
+    clearTimeout(checkTimer);
+    inp.style.borderColor = '';
+    if (!clean || clean.length < 3) {
+      hint.textContent = 'At least 3 characters required.';
+      hint.style.color = 'var(--dim)';
+      status.textContent = '';
+      urlBox.style.display = 'none';
+      return;
+    }
+    urlVal.textContent = location.origin + '/portfolio/' + clean;
+    urlBox.style.display = 'block';
+    hint.textContent = 'Checking…'; hint.style.color = 'var(--cyan)';
+    status.innerHTML = '<i class="fas fa-circle-notch fa-spin" style="color:var(--cyan)"></i>';
+    checkTimer = setTimeout(async () => {
+      const { data } = await supa.from('portfolios').select('slug').eq('slug', clean).maybeSingle();
+      if (data) {
+        hint.textContent = `"${clean}" is taken. Try another.`; hint.style.color = 'var(--red)';
+        status.innerHTML = '<i class="fas fa-xmark" style="color:var(--red)"></i>';
+        inp.style.borderColor = 'var(--red)'; slugOk = false;
+      } else {
+        hint.textContent = `"${clean}" is available!`; hint.style.color = 'var(--green)';
+        status.innerHTML = '<i class="fas fa-check" style="color:var(--green)"></i>';
+        inp.style.borderColor = 'var(--green)'; slugOk = true;
+      }
+    }, 500);
+  };
+
+  window.createPortfolio = async function(userId, fullName) {
+    const slug = document.getElementById('setup-slug').value.trim();
+    if (!slugOk) { toast('Pick a valid, available slug first', 'err'); return; }
+    const btn = document.getElementById('setup-btn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Creating…';
+    const initials = fullName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const { error } = await supa.from('portfolios').insert({
+      user_id: userId, slug,
+      data: buildDefaultData(slug, fullName, initials, user.email)
+    });
+    if (error) { toast(error.message, 'err'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-rocket"></i> Set Up My Portfolio'; return; }
+    toast('Portfolio created!', 'ok');
+    setTimeout(() => init(), 800);
+  };
+}
+
+function buildDefaultData(slug, name, initials, email) {
+  return {
+    meta: { slug },
+    profile: {
+      name, initials,
+      photo: 'https://randomuser.me/api/portraits/men/1.jpg',
+      availability: 'Open to Opportunities', availability_dot: true,
+      roles: ['Engineering Student','Problem Solver','Researcher'],
+      headline: 'Engineering Student',
+      tagline: 'A passionate engineering student ready to make an impact.',
+      chips: [
+        {icon:'fas fa-cog', color:'cyan',   label:'Specialty', value:'Engineering'},
+        {icon:'fas fa-star',color:'orange', label:'Status',    value:'Available'},
+      ],
+      about: {
+        title: 'About Me, ', highlight: 'Passionate Engineer',
+        paragraphs: ['Write your introduction here.','Share what drives you.','Mention what you are looking for.'],
+        details: {degree:'B.Tech',university:'Your University',graduation:'2026',location:'City, Country',specialization:'Your Specialisation',status:'Open to Opportunities',cgpa:'0.0'},
+      },
+    },
+    contact: {email: email||'', phone:'', linkedin:'linkedin.com/in/you', linkedin_url:'#', github:'github.com/you', github_url:'#', cv_url:'#'},
+    stats: [{value:0,decimals:1,label:'CGPA'},{value:0,decimals:0,label:'Projects'},{value:0,decimals:0,label:'Certifications'},{value:0,decimals:0,label:'Awards'}],
+    skills: {core:[], computational:[], tools:[]},
+    projects:[], education:[], certifications:[], honours:[], publications:[], patents:[], volunteer:[], services:[],
+    career_break: {enabled:false,title:'',period:'',duration:'',location:'',paragraphs:[],bullets:[],outcomes:[]},
+  };
 }
 
 function renderDashboard(user, row) {
