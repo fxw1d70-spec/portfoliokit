@@ -723,7 +723,8 @@ function sendMsg(e){
 /* ── boot ───────────────────────────────────────────────── */
 (async function boot(){
   const main=document.getElementById('main');
-  const slug=new URLSearchParams(location.search).get('slug');
+  const slug=new URLSearchParams(location.search).get('slug')
+    ||(location.pathname.startsWith('/portfolio/')?location.pathname.split('/portfolio/')[1].split('?')[0]:null);
   if(!slug){
     main.innerHTML='<p style="text-align:center;padding:6rem;color:var(--muted)">No portfolio specified.</p>';
     return;
