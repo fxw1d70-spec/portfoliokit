@@ -284,10 +284,10 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Creating account…';
 
-  // 1. Create auth user
+  // Create auth user — slug passed in metadata so the DB trigger can use it
   const { data: authData, error: authErr } = await supa.auth.signUp({
     email, password,
-    options: { data: { full_name: fullName } }
+    options: { data: { full_name: fullName, slug } }
   });
 
   if (authErr) {
@@ -297,31 +297,17 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     return;
   }
 
-  const userId = authData.user?.id;
-  if (!userId) {
-    showErr('Account created — check your email to confirm, then sign in.');
-    btn.innerHTML = '<i class="fas fa-envelope"></i> Check your email';
-    return;
-  }
-
-  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Setting up portfolio…';
-
-  // 2. Insert portfolio row
-  const { error: dbErr } = await supa.from('portfolios').insert({
-    user_id: userId,
-    slug,
-    data: defaultData(slug, fullName),
-  });
-
-  if (dbErr) {
-    showErr(`Account created but portfolio setup failed: ${dbErr.message}`);
+  // Supabase DB trigger (handle_new_user) creates the portfolio row automatically.
+  // If a session was returned the user is logged in; if not, email confirmation is on.
+  if (authData.session) {
+    btn.innerHTML = '<i class="fas fa-check"></i> All set! Redirecting…';
+    setTimeout(() => window.location.href = '/admin/edit', 800);
+  } else {
+    // Email confirmation is enabled in Supabase — ask user to confirm then sign in
+    btn.innerHTML = '<i class="fas fa-envelope"></i> Check your email to confirm';
+    showErr('Almost there! Check your inbox and click the confirmation link, then sign in.');
     btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-rocket"></i> Retry';
-    return;
   }
-
-  btn.innerHTML = '<i class="fas fa-check"></i> All set! Redirecting…';
-  setTimeout(() => window.location.href = '/admin/edit', 800);
 });
 </script>
 </body>
