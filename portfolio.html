@@ -21,8 +21,9 @@ img{display:block;max-width:100%}a{text-decoration:none;color:inherit}
 .nav{position:fixed;inset:0 0 auto 0;z-index:900;height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;transition:var(--ease)}
 .nav.solid{background:rgba(4,8,15,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);box-shadow:0 4px 30px rgba(0,0,0,.4)}
 .nav-logo{font-family:'Space Grotesk',sans-serif;font-size:1.55rem;font-weight:800;background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-1px}
-.nav-links{list-style:none;display:flex;align-items:center;gap:2.2rem}
-.nav-links a{font-size:.875rem;font-weight:500;color:var(--muted);transition:var(--ease);position:relative}
+.nav-links{list-style:none;display:flex;align-items:center;gap:1.4rem;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{font-size:.82rem;font-weight:500;color:var(--muted);transition:var(--ease);position:relative;white-space:nowrap}
 .nav-links a::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:2px;background:var(--cyan);transform:scaleX(0);transition:var(--ease)}
 .nav-links a:hover{color:var(--text)}.nav-links a:hover::after{transform:scaleX(1)}
 .nav-cta{background:var(--g1)!important;color:#fff!important;padding:.45rem 1.2rem;border-radius:50px;font-weight:600!important}
@@ -651,13 +652,21 @@ function rFooter(d){
 
 /* ── build nav ──────────────────────────────────────────── */
 function buildNav(d){
-  const p=d.profile||{},c=d.contact||{};
+  const p=d.profile||{},c=d.contact||{},sk=d.skills||{};
   document.getElementById('nav-logo').textContent=(p.initials||'??')+'.';
   document.title=`${p.name||'Portfolio'} — ${p.headline||''}`;
-  const links=[
-    ['#about','About'],['#skills','Skills'],['#projects','Projects'],
-    ['#education','Education'],['#contact','Contact'],
-  ];
+  const links=[['#home','Home'],['#about','About']];
+  if((sk.core||[]).length||(sk.computational||[]).length||(sk.tools||[]).length) links.push(['#skills','Skills']);
+  if((d.projects||[]).length)        links.push(['#projects','Projects']);
+  if((d.education||[]).length)       links.push(['#education','Education']);
+  if((d.certifications||[]).length)  links.push(['#certifications','Certifications']);
+  if((d.honours||[]).length)         links.push(['#honours','Awards']);
+  if((d.publications||[]).length)    links.push(['#publications','Publications']);
+  if((d.patents||[]).length)         links.push(['#patents','Patents']);
+  if((d.volunteer||[]).length)       links.push(['#volunteer','Volunteer']);
+  if((d.services||[]).length)        links.push(['#services','Services']);
+  if(d.career_break?.enabled)        links.push(['#career-break','Career Break']);
+  links.push(['#contact','Contact']);
   document.getElementById('nav-links').innerHTML=
     links.map(([h,l])=>`<li><a href="${h}">${l}</a></li>`).join('')+
     `<li><a href="${esc(c.cv_url)}" class="nav-cta"><i class="fas fa-download" style="font-size:.8rem"></i> Resume</a></li>`;
