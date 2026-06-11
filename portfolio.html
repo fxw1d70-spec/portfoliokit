@@ -650,6 +650,34 @@ function rFooter(d){
   </footer>`;
 }
 
+/* ── theme ──────────────────────────────────────────────── */
+function applyTheme(t){
+  const root=document.documentElement;
+  const P={
+    cyan:  ['#00d4ff','linear-gradient(135deg,#00d4ff,#0088bb)','rgba(0,212,255,.12)','0 0 30px rgba(0,212,255,.18)'],
+    orange:['#ff6b35','linear-gradient(135deg,#ff8c42,#cc3a00)','rgba(255,107,53,.12)','0 0 30px rgba(255,107,53,.18)'],
+    purple:['#a78bfa','linear-gradient(135deg,#a78bfa,#7c3aed)','rgba(167,139,250,.12)','0 0 30px rgba(167,139,250,.18)'],
+    green: ['#22c55e','linear-gradient(135deg,#22c55e,#15803d)','rgba(34,197,94,.12)','0 0 30px rgba(34,197,94,.18)'],
+    gold:  ['#ffd700','linear-gradient(135deg,#ffd700,#b8860b)','rgba(255,215,0,.12)','0 0 30px rgba(255,215,0,.18)'],
+    pink:  ['#ec4899','linear-gradient(135deg,#ec4899,#9d174d)','rgba(236,72,153,.12)','0 0 30px rgba(236,72,153,.18)'],
+  };
+  const pr=P[t?.preset]||P.cyan;
+  root.style.setProperty('--cyan',pr[0]);
+  root.style.setProperty('--g1',pr[1]);
+  root.style.setProperty('--border',pr[2]);
+  root.style.setProperty('--glow',pr[3]);
+  if(t?.bg_image){
+    const ov=t.bg_overlay!=null?Number(t.bg_overlay):0.9;
+    root.style.setProperty('--bg-0',`rgba(4,8,15,${ov})`);
+    root.style.setProperty('--bg-1',`rgba(8,15,28,${ov})`);
+    root.style.setProperty('--bg-2',`rgba(12,21,44,${ov})`);
+    document.body.style.backgroundImage=`url(${JSON.stringify(t.bg_image)})`;
+    document.body.style.backgroundSize='cover';
+    document.body.style.backgroundPosition='center';
+    document.body.style.backgroundAttachment='fixed';
+  }
+}
+
 /* ── build nav ──────────────────────────────────────────── */
 function buildNav(d){
   const p=d.profile||{},c=d.contact||{},sk=d.skills||{};
@@ -676,6 +704,7 @@ function buildNav(d){
 
 /* ── main render ────────────────────────────────────────── */
 function renderAll(d){
+  applyTheme(d.theme);
   buildNav(d);
   const html=[
     rHero(d), rStats(d), rAbout(d), rSkills(d), rProjects(d),

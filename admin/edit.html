@@ -86,6 +86,14 @@ a{text-decoration:none;color:inherit}
 .upload-btn.uploading{color:var(--cyan);border-style:solid}
 .file-link{font-size:.75rem;color:var(--cyan);display:inline-flex;align-items:center;gap:.35rem;margin-top:.1rem}
 .file-link:hover{text-decoration:underline}
+/* THEME */
+.theme-presets{display:flex;flex-wrap:wrap;gap:.8rem;margin-bottom:1.5rem}
+.swatch{width:46px;height:46px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:var(--ease);flex-shrink:0;outline:none}
+.swatch.active{border-color:#fff;box-shadow:0 0 0 3px var(--cyan)}
+.swatch:hover:not(.active){transform:scale(1.12);border-color:rgba(255,255,255,.3)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.1);outline:none;cursor:pointer;margin-top:.5rem}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--cyan);cursor:pointer}
+.theme-note{font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:1.1rem}
 </style>
 </head>
 <body>
@@ -115,6 +123,7 @@ a{text-decoration:none;color:inherit}
     <div class="tab-item" data-tab="volunteer"><i class="fas fa-hands-helping"></i> Volunteer</div>
     <div class="tab-item" data-tab="services"><i class="fas fa-concierge-bell"></i> Services</div>
     <div class="tab-item" data-tab="break"><i class="fas fa-pause-circle"></i> Career Break</div>
+    <div class="tab-item" data-tab="theme"><i class="fas fa-palette"></i> Theme</div>
   </nav>
 
   <div class="content">
@@ -294,6 +303,42 @@ a{text-decoration:none;color:inherit}
         <button class="add-btn" onclick="addExtLink('brk')"><i class="fas fa-plus"></i> Add Link</button>
       </div>
     </div>
+
+    <!-- THEME -->
+    <div class="panel" id="tab-theme">
+      <div class="panel-title">Theme & Appearance</div>
+
+      <div class="sec-label">Accent Colour</div>
+      <p class="theme-note">Sets the highlight colour used across your entire portfolio — buttons, headings, borders, icons, and skill bars.</p>
+      <div class="theme-presets" id="swatch-row">
+        <button class="swatch active" data-preset="cyan"   style="background:linear-gradient(135deg,#00d4ff,#0088bb)" title="Cyan (Default)"></button>
+        <button class="swatch"        data-preset="orange" style="background:linear-gradient(135deg,#ff8c42,#cc3a00)" title="Orange"></button>
+        <button class="swatch"        data-preset="purple" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)" title="Purple"></button>
+        <button class="swatch"        data-preset="green"  style="background:linear-gradient(135deg,#22c55e,#15803d)" title="Green"></button>
+        <button class="swatch"        data-preset="gold"   style="background:linear-gradient(135deg,#ffd700,#b8860b)" title="Gold"></button>
+        <button class="swatch"        data-preset="pink"   style="background:linear-gradient(135deg,#ec4899,#9d174d)" title="Pink"></button>
+      </div>
+      <input type="hidden" id="th-preset" value="cyan">
+
+      <div class="sec-label" style="margin-top:1.5rem">Background Image</div>
+      <p class="theme-note">Upload a photo or texture as your portfolio background. A dark overlay keeps text readable — adjust it below.</p>
+      <div class="fg">
+        <label>Image URL</label>
+        <div class="upload-row">
+          <div class="img-thumb" id="th-bg-thumb"><i class="fas fa-image"></i></div>
+          <div class="upload-col">
+            <input id="th-bg" placeholder="Paste image URL, or upload from device" oninput="syncBgThumb();mark()">
+            <label class="upload-btn"><i class="fas fa-upload"></i> Upload background image<input type="file" accept="image/*" onchange="uploadImg(this,'th-bg','th-bg-thumb','backgrounds').then(syncBgThumb)"></label>
+            <button class="btn btn-ghost btn-sm" style="color:var(--red);width:fit-content;margin-top:.1rem" onclick="sv('th-bg','');syncBgThumb();mark()"><i class="fas fa-times"></i> Remove image</button>
+          </div>
+        </div>
+      </div>
+      <div class="fg" id="th-overlay-group" style="display:none">
+        <label>Overlay darkness — <span id="th-overlay-val">90</span>%</label>
+        <input type="range" id="th-overlay" min="65" max="98" value="90" oninput="document.getElementById('th-overlay-val').textContent=this.value;mark()">
+        <p style="font-size:.75rem;color:var(--dim);margin-top:.5rem">Higher = darker overlay, more readable text. Lower = background image more visible.</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -432,6 +477,8 @@ function populateAll(){
   populateBrkBullets(b.bullets||[]);
   populateBrkOutcomes(b.outcomes||[]);
   populateExtLinks('brk',b.links||[]);
+  // Theme
+  populateTheme(DATA.theme||{});
 }
 
 /* ── ROLES ─────────────────────────────────────────────── */
@@ -891,6 +938,7 @@ function collectAll(){
     career_break:{enabled:brkEnabled,title:v('brk-title'),period:v('brk-period'),duration:v('brk-duration'),
       location:v('brk-location'),paragraphs:[v('brk-p1'),v('brk-p2')].filter(Boolean),
       bullets:brkBullets,outcomes:brkOutcomes,links:collectLinks('brk')},
+    theme:collectTheme(),
   };
 }
 function gv(id){const el=document.getElementById(id);return el?el.value:'';}
@@ -929,6 +977,42 @@ function toast(msg,type='ok'){
   el.className=`toast ${type} show`;
   document.getElementById('toast-msg').textContent=msg;
   toastTimer=setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+/* ── THEME ─────────────────────────────────────────────── */
+document.querySelectorAll('.swatch').forEach(s=>{
+  s.addEventListener('click',()=>{
+    document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));
+    s.classList.add('active');
+    document.getElementById('th-preset').value=s.dataset.preset;
+    mark();
+  });
+});
+function syncBgThumb(){
+  const url=document.getElementById('th-bg')?.value?.trim();
+  const thumb=document.getElementById('th-bg-thumb');
+  if(thumb)thumb.innerHTML=url
+    ?`<img src="${url}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\'></i>'">`
+    :'<i class="fas fa-image"></i>';
+  const og=document.getElementById('th-overlay-group');
+  if(og)og.style.display=url?'block':'none';
+}
+function populateTheme(th){
+  const preset=th?.preset||'cyan';
+  sv('th-preset',preset);
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.preset===preset));
+  sv('th-bg',th?.bg_image||'');
+  syncBgThumb();
+  const ov=th?.bg_overlay!=null?Math.round(Number(th.bg_overlay)*100):90;
+  const slider=document.getElementById('th-overlay');
+  const lbl=document.getElementById('th-overlay-val');
+  if(slider)slider.value=ov;
+  if(lbl)lbl.textContent=ov;
+}
+function collectTheme(){
+  const bg=v('th-bg');
+  const ov=parseInt(document.getElementById('th-overlay')?.value||'90');
+  return{preset:v('th-preset')||'cyan',bg_image:bg||null,bg_overlay:bg?ov/100:null};
 }
 
 /* ── KEYBOARD ─────────────────────────────────────────── */
