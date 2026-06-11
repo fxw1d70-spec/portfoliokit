@@ -205,7 +205,7 @@ a{text-decoration:none;color:inherit}
       <button class="add-btn" onclick="addSkill('core')"><i class="fas fa-plus"></i> Add Core Skill</button>
 
       <div class="sec-label" style="margin-top:1.5rem">Computational & Programming Skills</div>
-      <div id="comp-skills" class="card-list"></div>
+      <div id="computational-skills" class="card-list"></div>
       <button class="add-btn" onclick="addSkill('computational')"><i class="fas fa-plus"></i> Add Comp Skill</button>
 
       <div class="sec-label" style="margin-top:1.5rem">Software & Tools (chips)</div>
@@ -789,7 +789,7 @@ function collectAll(){
   const coreSkills=[...document.querySelectorAll('#core-skills .list-card')].map(c=>{
     const id=c.id.replace('card-','');return {name:gv(id+'-name'),percent:parseInt(gv(id+'-pct'))||0};
   });
-  const compSkills=[...document.querySelectorAll('#comp-skills .list-card')].map(c=>{
+  const compSkills=[...document.querySelectorAll('#computational-skills .list-card')].map(c=>{
     const id=c.id.replace('card-','');return {name:gv(id+'-name'),percent:parseInt(gv(id+'-pct'))||0};
   });
   const tools=collectSimpleList('tools-list','val');
