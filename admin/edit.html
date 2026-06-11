@@ -289,6 +289,9 @@ a{text-decoration:none;color:inherit}
         <div class="sec-label" style="margin-top:1.5rem">Outcome Stats (max 3)</div>
         <div id="brk-outcomes" class="card-list"></div>
         <button class="add-btn" onclick="addBrkOutcome()"><i class="fas fa-plus"></i> Add Outcome</button>
+        <div class="sec-label" style="margin-top:1.5rem">External Links &amp; Resources</div>
+        <div id="brk-links-list" class="card-list" style="gap:.4rem;margin-bottom:.6rem"></div>
+        <button class="add-btn" onclick="addExtLink('brk')"><i class="fas fa-plus"></i> Add Link</button>
       </div>
     </div>
   </div>
@@ -428,6 +431,7 @@ function populateAll(){
   sv('brk-p1',(b.paragraphs||[])[0]);sv('brk-p2',(b.paragraphs||[])[1]);
   populateBrkBullets(b.bullets||[]);
   populateBrkOutcomes(b.outcomes||[]);
+  populateExtLinks('brk',b.links||[]);
 }
 
 /* ── ROLES ─────────────────────────────────────────────── */
@@ -562,7 +566,8 @@ function projBody(id,p){
   </div>
   <div class="sec-label">Tags (max 3)</div>
   <div id="${id}-tags">${tags}</div>
-  <button class="add-btn" style="margin-top:.5rem" onclick="addProjTag('${id}')"><i class="fas fa-plus"></i> Add Tag</button>`;
+  <button class="add-btn" style="margin-top:.5rem" onclick="addProjTag('${id}')"><i class="fas fa-plus"></i> Add Tag</button>
+  ${linksBody(id, p.links||[])}`;
 }
 function addProject(){
   const el=document.getElementById('projects-list');
@@ -591,7 +596,8 @@ function tlBody(id,it){
     <div class="fg"><label>Role / Title</label><input id="${id}-role" value="${esc(it.role||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
     <div class="fg"><label>Organisation</label><input id="${id}-org" value="${esc(it.org||'')}" oninput="mark()"></div>
   </div>
-  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3">${esc(it.description||'')}</textarea></div>`;
+  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3">${esc(it.description||'')}</textarea></div>
+  ${linksBody(id, it.links||[])}`;
 }
 function addTimeline(type){
   const el=document.getElementById(type+'-list');
@@ -795,11 +801,12 @@ function collectAll(){
     })).filter(t=>t.label):[];
     return {number:gv(id+'-num'),title:gv(id+'-title'),description:gv(id+'-desc'),
       image:gv(id+'-img'),github_url:gv(id+'-gh'),demo_url:gv(id+'-demo'),
-      demo_label:gv(id+'-dlbl'),demo_icon:gv(id+'-dico'),date:gv(id+'-date'),tags};
+      demo_label:gv(id+'-dlbl'),demo_icon:gv(id+'-dico'),date:gv(id+'-date'),tags,
+      links:collectLinks(id)};
   });
   const tlCollect=listId=>[...document.querySelectorAll(`#${listId} .list-card`)].map(c=>{
     const id=c.id.replace('card-','');
-    return {period:gv(id+'-period'),dot:gv(id+'-dot'),role:gv(id+'-role'),org:gv(id+'-org'),description:gv(id+'-desc')};
+    return {period:gv(id+'-period'),dot:gv(id+'-dot'),role:gv(id+'-role'),org:gv(id+'-org'),description:gv(id+'-desc'),links:collectLinks(id)};
   });
   const certs=[...document.querySelectorAll('#certs-list .list-card')].map(c=>{
     const id=c.id.replace('card-','');
@@ -852,7 +859,7 @@ function collectAll(){
     services,
     career_break:{enabled:brkEnabled,title:v('brk-title'),period:v('brk-period'),duration:v('brk-duration'),
       location:v('brk-location'),paragraphs:[v('brk-p1'),v('brk-p2')].filter(Boolean),
-      bullets:brkBullets,outcomes:brkOutcomes},
+      bullets:brkBullets,outcomes:brkOutcomes,links:collectLinks('brk')},
   };
 }
 function gv(id){const el=document.getElementById(id);return el?el.value:'';}
@@ -898,6 +905,50 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();savePortfolio();}
 });
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+
+/* ── EXTERNAL LINKS ───────────────────────────────────── */
+function linkRow(pid, idx, l) {
+  const rid = `${pid}-lnk-${idx}`;
+  return `<div class="list-card" id="card-${rid}" style="padding:.6rem 1rem">
+    <div style="display:flex;align-items:center;gap:.5rem">
+      <i class="fas fa-link" style="color:var(--dim);font-size:.78rem;flex-shrink:0"></i>
+      <input id="${rid}-url" value="${esc(l.url||'')}" placeholder="https://youtube.com, drive.google.com/…" oninput="mark()" style="flex:1;font-size:.8rem;padding:.4rem .7rem">
+      <input id="${rid}-label" value="${esc(l.label||'')}" placeholder="Label, e.g. Watch Demo" oninput="mark()" style="width:155px;flex-shrink:0;font-size:.8rem;padding:.4rem .7rem">
+      <button class="btn-ghost btn" onclick="this.closest('.list-card').remove();mark()" style="padding:.3rem .5rem"><i class="fas fa-trash-can"></i></button>
+    </div>
+  </div>`;
+}
+
+function linksBody(id, links) {
+  const rows = (links||[]).map((l,i) => linkRow(id, i, l)).join('');
+  return `<div class="sec-label" style="margin-top:1.2rem">External Links &amp; Resources</div>
+  <div id="${id}-links-list" class="card-list" style="gap:.4rem;margin-bottom:.6rem">${rows}</div>
+  <button class="add-btn" onclick="addExtLink('${id}')"><i class="fas fa-plus"></i> Add Link</button>`;
+}
+
+function populateExtLinks(id, links) {
+  const list = document.getElementById(id + '-links-list');
+  if (!list) return;
+  list.innerHTML = (links||[]).map((l,i) => linkRow(id, i, l)).join('');
+}
+
+function addExtLink(id) {
+  const list = document.getElementById(id + '-links-list');
+  if (!list) return;
+  list.insertAdjacentHTML('beforeend', linkRow(id, Date.now(), {}));
+  mark();
+}
+
+function collectLinks(id) {
+  const list = document.getElementById(id + '-links-list');
+  if (!list) return [];
+  return [...list.querySelectorAll('.list-card')].map(c => {
+    const cid = c.id.replace('card-','');
+    const url   = (document.getElementById(cid+'-url')?.value  || '').trim();
+    const label = (document.getElementById(cid+'-label')?.value|| '').trim();
+    return url ? {url, label: label||'View Link'} : null;
+  }).filter(Boolean);
+}
 
 /* ── FILE UPLOADS ──────────────────────────────────────── */
 async function uploadToStorage(file, folder) {

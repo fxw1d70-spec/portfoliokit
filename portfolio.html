@@ -225,6 +225,11 @@ footer{background:var(--bg-1);border-top:1px solid var(--border);padding:2rem 3r
 .btt{position:fixed;bottom:2rem;right:2rem;width:46px;height:46px;background:var(--g1);border:none;border-radius:50%;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease);opacity:0;pointer-events:none;box-shadow:0 4px 22px rgba(0,212,255,.4);z-index:800}
 .btt.show{opacity:1;pointer-events:auto}.btt:hover{transform:translateY(-4px) scale(1.1)}
 /* RESPONSIVE */
+/* EXTERNAL LINK PILLS */
+.ext-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.85rem}
+.ext-pill{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .9rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:50px;font-size:.78rem;font-weight:500;color:var(--muted);transition:var(--ease)}
+.ext-pill:hover{border-color:var(--cyan);color:var(--text);background:rgba(0,212,255,.06);transform:translateY(-2px)}
+.ext-pill i{font-size:.8rem}
 @media(max-width:1024px){.projects-grid{grid-template-columns:1fr 1fr}.certs-grid{grid-template-columns:1fr 1fr}.svc-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){
   .nav{padding:0 1.5rem}.nav-links{display:none}.burger{display:flex}
@@ -283,6 +288,28 @@ const PUB_LABEL={journal:'Journal Article',conference:'Conference Paper',tech:'T
 const PUB_STATUS={published:'ps-published',accepted:'ps-accepted',submitted:'ps-submitted'};
 const PUB_SLABEL={published:'Published',accepted:'Accepted',submitted:'Under Review'};
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function detectLinkMeta(url){
+  const u=(url||'').toLowerCase();
+  if(u.includes('youtu'))        return{icon:'fab fa-youtube',      color:'#ff0000'};
+  if(u.includes('drive.google')) return{icon:'fab fa-google-drive', color:'#4285f4'};
+  if(u.includes('docs.google'))  return{icon:'fas fa-file-alt',     color:'#4285f4'};
+  if(u.includes('github.com'))   return{icon:'fab fa-github',       color:'var(--text)'};
+  if(u.includes('figma.com'))    return{icon:'fab fa-figma',        color:'#f24e1e'};
+  if(u.includes('notion.so'))    return{icon:'fas fa-book',         color:'var(--text)'};
+  if(u.includes('vimeo.com'))    return{icon:'fab fa-vimeo',        color:'#1ab7ea'};
+  if(u.includes('dropbox.com'))  return{icon:'fab fa-dropbox',      color:'#0061ff'};
+  if(u.includes('onedrive.')||u.includes('sharepoint.')) return{icon:'fas fa-cloud',color:'#0078d4'};
+  if(u.endsWith('.pdf')||u.includes('/pdf')) return{icon:'fas fa-file-pdf',color:'var(--red)'};
+  return{icon:'fas fa-external-link-alt', color:'var(--muted)'};
+}
+function renderExtLinks(links){
+  if(!links?.length)return'';
+  const pills=links.filter(l=>l.url).map(l=>{
+    const m=detectLinkMeta(l.url);
+    return`<a href="${esc(l.url)}" target="_blank" rel="noopener" class="ext-pill"><i class="${m.icon}" style="color:${m.color}"></i>${esc(l.label||'View Link')}</a>`;
+  }).join('');
+  return pills?`<div class="ext-links">${pills}</div>`:'';
+}
 function secHead(tag,title,em,sub){
   return `<div class="sec-head rv"><span class="sec-tag">${tag}</span>
   <h2 class="sec-title">${esc(title)} <em>${esc(em)}</em></h2>
@@ -405,6 +432,7 @@ function rProjects(d){
         <div class="proj-tags">${(p.tags||[]).map(t=>`<span class="tag ${TAG[t.color]||'tag-c'}">${esc(t.label)}</span>`).join('')}</div>
         <h3 class="proj-title">${esc(p.title)}</h3>
         <p class="proj-desc">${esc(p.description)}</p>
+        ${renderExtLinks(p.links)}
         <div class="proj-foot">
           <div class="proj-links">
             <a href="${esc(p.github_url)}" class="proj-lnk"><i class="fab fa-github"></i> GitHub</a>
@@ -430,6 +458,7 @@ function rTimeline(items,id,secClass,tag,title,em,sub){
         <div class="tl-role">${esc(it.role)}</div>
         <div class="tl-org">${esc(it.org)}</div>
         <div class="tl-info">${esc(it.description)}</div>
+        ${renderExtLinks(it.links)}
       </div>
     </div>`).join('');
   return `<section class="${secClass}" id="${id}"><div class="wrap">
@@ -540,6 +569,7 @@ function rBreak(d){
         <div class="brk-badge"><i class="fas fa-pause-circle"></i> Voluntary Break</div>
       </div>
       <div class="brk-body">${paras}${bullets?`<ul class="brk-bullets">${bullets}</ul>`:''}</div>
+      ${renderExtLinks(b.links)}
       ${outcomes?`<div class="brk-outcomes">${outcomes}</div>`:''}
     </div></div>
   </div></section>`;
