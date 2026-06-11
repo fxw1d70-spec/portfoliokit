@@ -618,7 +618,16 @@ function certBody(id,c){
     <div class="fg"><label>Icon BG Color</label>${iconBgSel(id+'-bg',c.icon_bg||'cyan')}</div>
     <div class="fg"><label>Badge Text</label><input id="${id}-badge" value="${esc(c.badge||'')}" oninput="mark()"></div>
     <div class="fg"><label>Badge Color</label>${iconBgSel(id+'-btype',c.badge_type||'cyan')}</div>
-  </div>`;
+  </div>
+  <div class="fg"><label>Certificate File (Image or PDF)</label>
+  <div class="upload-row">
+    <div class="img-thumb" id="${id}-file-thumb">${fileThumbInit(c.file_url)}</div>
+    <div class="upload-col">
+      <input id="${id}-file" value="${esc(c.file_url||'')}" placeholder="Paste URL or upload below" oninput="syncFileThumb('${id}-file','${id}-file-thumb');mark()">
+      <label class="upload-btn"><i class="fas fa-upload"></i> Upload Image / PDF<input type="file" accept="image/*,.pdf" onchange="uploadAny(this,'${id}-file','${id}-file-thumb','certs')"></label>
+    </div>
+  </div></div>
+  ${linksBody(id, c.links||[])}`;
 }
 function addCert(){
   const el=document.getElementById('certs-list');
@@ -640,7 +649,16 @@ function honBody(id,h){
     <div class="fg"><label>Badge Text</label><input id="${id}-badge" value="${esc(h.badge||'')}" oninput="mark()"></div>
     <div class="fg"><label>Badge Color</label>${iconBgSel(id+'-bcolor',h.badge_color||'gold')}</div>
   </div>
-  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="2">${esc(h.description||'')}</textarea></div>`;
+  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="2">${esc(h.description||'')}</textarea></div>
+  <div class="fg"><label>Award File (Image or PDF)</label>
+  <div class="upload-row">
+    <div class="img-thumb" id="${id}-file-thumb">${fileThumbInit(h.file_url)}</div>
+    <div class="upload-col">
+      <input id="${id}-file" value="${esc(h.file_url||'')}" placeholder="Paste URL or upload below" oninput="syncFileThumb('${id}-file','${id}-file-thumb');mark()">
+      <label class="upload-btn"><i class="fas fa-upload"></i> Upload Image / PDF<input type="file" accept="image/*,.pdf" onchange="uploadAny(this,'${id}-file','${id}-file-thumb','honours')"></label>
+    </div>
+  </div></div>
+  ${linksBody(id, h.links||[])}`;
 }
 function addHonour(){
   const el=document.getElementById('honours-list');
@@ -664,7 +682,11 @@ function pubBody(id,p){
   <div class="row2">
     <div class="fg"><label>Status</label>${pubStatusSel(id+'-status',p.status||'submitted')}</div>
     <div class="fg"><label>DOI / URL</label><input id="${id}-doi" value="${esc(p.doi_url||'')}"></div>
-    <div class="fg"><label>PDF URL</label><input id="${id}-pdf" value="${esc(p.pdf_url||'')}"></div>
+  </div>
+  <div class="sec-label">Resource Link</div>
+  <div class="row2">
+    <div class="fg"><label>Resource URL</label><input id="${id}-rurl" value="${esc(p.resource_url||'')}" placeholder="https://drive.google.com/… or any link" oninput="mark()"></div>
+    <div class="fg"><label>Link Label</label><input id="${id}-rlabel" value="${esc(p.resource_label||'')}" placeholder="e.g. Full Paper, Dataset, Slides" oninput="mark()"></div>
   </div>`;
 }
 function addPub(){
@@ -686,7 +708,16 @@ function patBody(id,p){
     <div class="fg"><label>Filed Date</label><input id="${id}-filed" value="${esc(p.filed||'')}" oninput="mark()"></div>
     <div class="fg"><label>Tag / Category</label><input id="${id}-tag" value="${esc(p.tag||'')}" oninput="mark()"></div>
   </div>
-  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3">${esc(p.description||'')}</textarea></div>`;
+  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3">${esc(p.description||'')}</textarea></div>
+  <div class="fg"><label>Patent Document (Image or PDF)</label>
+  <div class="upload-row">
+    <div class="img-thumb" id="${id}-file-thumb">${fileThumbInit(p.file_url)}</div>
+    <div class="upload-col">
+      <input id="${id}-file" value="${esc(p.file_url||'')}" placeholder="Paste URL or upload below" oninput="syncFileThumb('${id}-file','${id}-file-thumb');mark()">
+      <label class="upload-btn"><i class="fas fa-upload"></i> Upload Image / PDF<input type="file" accept="image/*,.pdf" onchange="uploadAny(this,'${id}-file','${id}-file-thumb','patents')"></label>
+    </div>
+  </div></div>
+  ${linksBody(id, p.links||[])}`;
 }
 function addPatent(){
   const el=document.getElementById('patents-list');
@@ -810,19 +841,19 @@ function collectAll(){
   });
   const certs=[...document.querySelectorAll('#certs-list .list-card')].map(c=>{
     const id=c.id.replace('card-','');
-    return {title:gv(id+'-title'),issuer:gv(id+'-issuer'),icon:gv(id+'-icon'),icon_bg:gv(id+'-bg'),badge:gv(id+'-badge'),badge_type:gv(id+'-btype')};
+    return {title:gv(id+'-title'),issuer:gv(id+'-issuer'),icon:gv(id+'-icon'),icon_bg:gv(id+'-bg'),badge:gv(id+'-badge'),badge_type:gv(id+'-btype'),file_url:gv(id+'-file'),links:collectLinks(id)};
   });
   const honours=[...document.querySelectorAll('#honours-list .list-card')].map(c=>{
     const id=c.id.replace('card-','');
-    return {title:gv(id+'-title'),year:gv(id+'-year'),icon:gv(id+'-icon'),icon_bg:gv(id+'-bg'),badge:gv(id+'-badge'),badge_color:gv(id+'-bcolor'),description:gv(id+'-desc')};
+    return {title:gv(id+'-title'),year:gv(id+'-year'),icon:gv(id+'-icon'),icon_bg:gv(id+'-bg'),badge:gv(id+'-badge'),badge_color:gv(id+'-bcolor'),description:gv(id+'-desc'),file_url:gv(id+'-file'),links:collectLinks(id)};
   });
   const publications=[...document.querySelectorAll('#pubs-list .list-card')].map(c=>{
     const id=c.id.replace('card-','');
-    return {title:gv(id+'-title'),type:gv(id+'-type'),year:gv(id+'-year'),authors:gv(id+'-authors'),venue:gv(id+'-venue'),status:gv(id+'-status'),doi_url:gv(id+'-doi'),pdf_url:gv(id+'-pdf')};
+    return {title:gv(id+'-title'),type:gv(id+'-type'),year:gv(id+'-year'),authors:gv(id+'-authors'),venue:gv(id+'-venue'),status:gv(id+'-status'),doi_url:gv(id+'-doi'),resource_url:gv(id+'-rurl'),resource_label:gv(id+'-rlabel')};
   });
   const patents=[...document.querySelectorAll('#patents-list .list-card')].map(c=>{
     const id=c.id.replace('card-','');
-    return {title:gv(id+'-title'),accent:gv(id+'-accent'),number:gv(id+'-num'),filed:gv(id+'-filed'),tag:gv(id+'-tag'),description:gv(id+'-desc')};
+    return {title:gv(id+'-title'),accent:gv(id+'-accent'),number:gv(id+'-num'),filed:gv(id+'-filed'),tag:gv(id+'-tag'),description:gv(id+'-desc'),file_url:gv(id+'-file'),links:collectLinks(id)};
   });
   const services=[...document.querySelectorAll('#services-list .list-card')].map(c=>{
     const id=c.id.replace('card-','');
@@ -1024,6 +1055,39 @@ function syncCvLink() {
   const url = document.getElementById('c-cv')?.value?.trim();
   const lnk = document.getElementById('c-cv-link');
   if (lnk) { lnk.style.display = url ? 'inline-flex' : 'none'; if (url) lnk.href = url; }
+}
+
+function fileThumbInit(url) {
+  if (!url) return '<i class="fas fa-file"></i>';
+  if (url.toLowerCase().includes('.pdf')) return '<i class="fas fa-file-pdf" style="color:var(--red);font-size:1.5rem"></i>';
+  return `<img src="${url}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-file\\'></i>'">`;
+}
+function syncFileThumb(urlId, thumbId) {
+  const url = (document.getElementById(urlId)?.value || '').trim();
+  const thumb = document.getElementById(thumbId);
+  if (!thumb) return;
+  thumb.innerHTML = fileThumbInit(url);
+}
+async function uploadAny(input, urlId, thumbId, folder) {
+  const file = input.files[0];
+  if (!file) return;
+  const btn = input.closest('.upload-btn');
+  const orig = btn.innerHTML;
+  btn.classList.add('uploading');
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Uploading…';
+  try {
+    const url = await uploadToStorage(file, folder);
+    document.getElementById(urlId).value = url;
+    syncFileThumb(urlId, thumbId);
+    mark();
+    toast('File uploaded!', 'ok');
+  } catch(e) {
+    toast('Upload failed: ' + e.message, 'err');
+  } finally {
+    btn.innerHTML = orig;
+    btn.classList.remove('uploading');
+    input.value = '';
+  }
 }
 
 /* ── BOOT ─────────────────────────────────────────────── */

@@ -142,7 +142,7 @@ section{padding:7rem 3rem}.wrap{max-width:1280px;margin:0 auto}
 .cert-badge{display:inline-block;font-size:.68rem;font-weight:700;padding:.18rem .6rem;border-radius:50px}
 /* HONOURS */
 .hon-bg{background:var(--bg-0)}.awards-list{display:flex;flex-direction:column;gap:.95rem;max-width:880px;margin:0 auto}
-.aw-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.4rem;display:flex;align-items:center;gap:1.1rem;transition:var(--ease);backdrop-filter:blur(10px)}
+.aw-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.4rem;display:flex;align-items:center;gap:1.1rem;transition:var(--ease);backdrop-filter:blur(10px);flex-wrap:wrap}
 .aw-item:hover{border-color:var(--gold);transform:translateX(7px);box-shadow:0 0 22px rgba(255,215,0,.08)}
 .aw-ico{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
 .aw-text{flex:1;min-width:0}.aw-text h4{font-size:.9rem;font-weight:700;margin-bottom:.2rem}.aw-text p{font-size:.78rem;color:var(--muted)}
@@ -301,6 +301,13 @@ function detectLinkMeta(url){
   if(u.includes('onedrive.')||u.includes('sharepoint.')) return{icon:'fas fa-cloud',color:'#0078d4'};
   if(u.endsWith('.pdf')||u.includes('/pdf')) return{icon:'fas fa-file-pdf',color:'var(--red)'};
   return{icon:'fas fa-external-link-alt', color:'var(--muted)'};
+}
+function fileViewBtn(url, label) {
+  if (!url) return '';
+  const isPdf = url.toLowerCase().includes('.pdf');
+  const icon = isPdf ? 'fas fa-file-pdf' : 'fas fa-image';
+  const color = isPdf ? 'var(--red)' : 'var(--cyan)';
+  return `<a href="${esc(url)}" target="_blank" rel="noopener" class="ext-pill"><i class="${icon}" style="color:${color}"></i>${esc(label)}</a>`;
 }
 function renderExtLinks(links){
   if(!links?.length)return'';
@@ -475,6 +482,7 @@ function rCerts(d){
       <div class="cert-info">
         <h4>${esc(c.title)}</h4><p>${esc(c.issuer)}</p>
         <span class="cert-badge" style="${cBadge(c.badge_type==='default'?'cyan':c.badge_type)}">${esc(c.badge)}</span>
+        ${(c.file_url||(c.links||[]).length)?`<div class="ext-links" style="margin-top:.6rem">${fileViewBtn(c.file_url,'View Certificate')}${(c.links||[]).filter(l=>l.url).map(l=>{const m=detectLinkMeta(l.url);return`<a href="${esc(l.url)}" target="_blank" rel="noopener" class="ext-pill"><i class="${m.icon}" style="color:${m.color}"></i>${esc(l.label||'Link')}</a>`;}).join('')}</div>`:''}
       </div>
     </div>`).join('');
   return `<section class="certs-bg" id="certifications"><div class="wrap">
@@ -491,6 +499,7 @@ function rHonours(d){
       <div class="aw-text"><h4>${esc(h.title)}</h4><p>${esc(h.description)}</p></div>
       <span class="aw-year">${esc(h.year)}</span>
       <span class="aw-badge" style="${cBadge(h.badge_color||'cyan')}">${esc(h.badge)}</span>
+      ${(h.file_url||(h.links||[]).length)?`<div style="width:100%;display:flex;flex-wrap:wrap;gap:.45rem;padding-top:.6rem;border-top:1px solid var(--border)">${fileViewBtn(h.file_url,'View Award')}${(h.links||[]).filter(l=>l.url).map(l=>{const m=detectLinkMeta(l.url);return`<a href="${esc(l.url)}" target="_blank" rel="noopener" class="ext-pill"><i class="${m.icon}" style="color:${m.color}"></i>${esc(l.label||'Link')}</a>`;}).join('')}</div>`:''}
     </div>`).join('');
   return `<section class="hon-bg" id="honours"><div class="wrap">
     ${secHead('// RECOGNITION','Honours &amp;','Awards','Academic distinctions and competition victories')}
@@ -510,8 +519,8 @@ function rPubs(d){
       <div class="pub-authors">${esc(p.authors)}</div>
       <div class="pub-venue">${esc(p.venue)}</div>
       <div class="pub-foot">
-        <a href="${esc(p.doi_url)}" class="pub-lnk"><i class="fas fa-external-link-alt"></i> DOI / Link</a>
-        <a href="${esc(p.pdf_url)}" class="pub-lnk"><i class="fas fa-file-pdf"></i> PDF</a>
+        ${p.doi_url?`<a href="${esc(p.doi_url)}" target="_blank" class="pub-lnk"><i class="fas fa-external-link-alt"></i> DOI / Link</a>`:''}
+        ${p.resource_url?`<a href="${esc(p.resource_url)}" target="_blank" class="pub-lnk"><i class="${detectLinkMeta(p.resource_url).icon}" style="color:${detectLinkMeta(p.resource_url).color}"></i> ${esc(p.resource_label||'View Resource')}</a>`:''}
         <span class="pub-status ${PUB_STATUS[p.status]||'ps-submitted'}">${PUB_SLABEL[p.status]||p.status}</span>
       </div>
     </div>`).join('');
@@ -530,6 +539,7 @@ function rPatents(d){
       <div class="pat-title">${esc(p.title)}</div>
       <div class="pat-desc">${esc(p.description)}</div>
       <div class="pat-foot"><span class="pat-date">${esc(p.filed)}</span><span class="pat-tag">${esc(p.tag)}</span></div>
+      ${(p.file_url||(p.links||[]).length)?`<div class="ext-links" style="margin-top:.6rem;padding-top:.7rem;border-top:1px solid var(--border)">${fileViewBtn(p.file_url,'View Patent')}${(p.links||[]).filter(l=>l.url).map(l=>{const m=detectLinkMeta(l.url);return`<a href="${esc(l.url)}" target="_blank" rel="noopener" class="ext-pill"><i class="${m.icon}" style="color:${m.color}"></i>${esc(l.label||'Link')}</a>`;}).join('')}</div>`:''}
     </div>`).join('');
   return `<section class="pat-bg" id="patents"><div class="wrap">
     ${secHead('// INTELLECTUAL PROPERTY','Patents &amp;','Inventions','Novel engineering innovations filed with the Indian Patent Office')}
