@@ -139,7 +139,7 @@ a{text-decoration:none;color:inherit}
         <div class="fg"><label>Headline / Title</label><input id="p-headline" placeholder="Mechanical Engineering Undergrad"></div>
         <div class="fg"><label>Availability Badge</label><input id="p-availability" placeholder="Open to Internships & Research"></div>
       </div>
-      <div class="fg"><label>Tagline / Hero Description</label><textarea id="p-tagline" rows="2"></textarea></div>
+      <div class="fg"><label>Tagline / Hero Description</label><textarea id="p-tagline" rows="2" placeholder="e.g. A passionate engineer solving real-world problems through innovative design and research."></textarea></div>
 
       <div class="sec-label">Roles (Typing Animation)</div>
       <div id="roles-list" class="card-list"></div>
@@ -157,9 +157,9 @@ a{text-decoration:none;color:inherit}
         <div class="fg"><label>Section Title</label><input id="ab-title" placeholder="About Me,"></div>
         <div class="fg"><label>Highlighted Word(s)</label><input id="ab-highlight" placeholder="Passionate Innovator"></div>
       </div>
-      <div class="fg"><label>Paragraph 1</label><textarea id="ab-p1" rows="3"></textarea></div>
-      <div class="fg"><label>Paragraph 2</label><textarea id="ab-p2" rows="3"></textarea></div>
-      <div class="fg"><label>Paragraph 3</label><textarea id="ab-p3" rows="3"></textarea></div>
+      <div class="fg"><label>Paragraph 1</label><textarea id="ab-p1" rows="3" placeholder="Introduce yourself — who you are, your background, and how you got into your field."></textarea></div>
+      <div class="fg"><label>Paragraph 2</label><textarea id="ab-p2" rows="3" placeholder="Share what drives you — your research interests, key achievements, or personal philosophy."></textarea></div>
+      <div class="fg"><label>Paragraph 3</label><textarea id="ab-p3" rows="3" placeholder="What are you looking for? Internships, research collaborations, full-time roles, or side projects?"></textarea></div>
       <div class="sec-label">Details Grid</div>
       <div class="row2">
         <div class="fg"><label>Degree</label><input id="det-degree" placeholder="B.Tech"></div>
@@ -177,12 +177,12 @@ a{text-decoration:none;color:inherit}
       <div class="panel-title">Contact & Stats</div>
       <div class="sec-label">Contact Info</div>
       <div class="row2">
-        <div class="fg"><label>Email</label><input id="c-email" type="email"></div>
-        <div class="fg"><label>Phone</label><input id="c-phone"></div>
-        <div class="fg"><label>LinkedIn Display</label><input id="c-linkedin"></div>
-        <div class="fg"><label>LinkedIn URL</label><input id="c-linkedin-url" type="url"></div>
-        <div class="fg"><label>GitHub Display</label><input id="c-github"></div>
-        <div class="fg"><label>GitHub URL</label><input id="c-github-url" type="url"></div>
+        <div class="fg"><label>Email</label><input id="c-email" type="email" placeholder="your.email@gmail.com"></div>
+        <div class="fg"><label>Phone</label><input id="c-phone" placeholder="+1 234 567 8900"></div>
+        <div class="fg"><label>LinkedIn Display</label><input id="c-linkedin" placeholder="linkedin.com/in/yourname"></div>
+        <div class="fg"><label>LinkedIn URL</label><input id="c-linkedin-url" type="url" placeholder="https://linkedin.com/in/yourname"></div>
+        <div class="fg"><label>GitHub Display</label><input id="c-github" placeholder="github.com/yourname"></div>
+        <div class="fg"><label>GitHub URL</label><input id="c-github-url" type="url" placeholder="https://github.com/yourname"></div>
       </div>
       <div class="fg">
         <label>CV / Resume</label>
@@ -276,13 +276,13 @@ a{text-decoration:none;color:inherit}
       </div>
       <div id="brk-fields">
         <div class="row2">
-          <div class="fg"><label>Title</label><input id="brk-title"></div>
+          <div class="fg"><label>Title</label><input id="brk-title" placeholder="e.g. Self-Development & Research Break"></div>
           <div class="fg"><label>Period</label><input id="brk-period" placeholder="May 2023 – Dec 2023"></div>
           <div class="fg"><label>Duration</label><input id="brk-duration" placeholder="8 months"></div>
           <div class="fg"><label>Location</label><input id="brk-location" placeholder="Remote / Bangalore, India"></div>
         </div>
-        <div class="fg"><label>Paragraph 1</label><textarea id="brk-p1" rows="3"></textarea></div>
-        <div class="fg"><label>Paragraph 2</label><textarea id="brk-p2" rows="3"></textarea></div>
+        <div class="fg"><label>Paragraph 1</label><textarea id="brk-p1" rows="3" placeholder="Explain why you took the break — personal growth, health, caregiving, travel, or exploration."></textarea></div>
+        <div class="fg"><label>Paragraph 2</label><textarea id="brk-p2" rows="3" placeholder="What did you do during the break? Courses, freelance work, volunteering, or side projects?"></textarea></div>
         <div class="sec-label">Bullet Points</div>
         <div id="brk-bullets" class="card-list"></div>
         <button class="add-btn" onclick="addBrkBullet()"><i class="fas fa-plus"></i> Add Bullet</button>
@@ -440,7 +440,7 @@ function populateRoles(arr){
   arr.forEach((r,i)=>{
     const id='role-'+i;
     el.appendChild(makeCard(id,r||'Role',
-      `<div class="fg"><label>Role Text</label><input id="${id}-val" value="${esc(r)}" oninput="updateCardTitle(this,'${id}');mark()"></div>`,
+      `<div class="fg"><label>Role Text</label><input id="${id}-val" value="${esc(r)}" placeholder="e.g. CAD Designer" oninput="updateCardTitle(this,'${id}');mark()"></div>`,
       null));
   });
 }
@@ -466,9 +466,9 @@ function populateChips(arr){
 }
 function chipBody(id,ch){
   return `<div class="row2">
-    <div class="fg"><label>Label</label><input id="${id}-label" value="${esc(ch.label||'')}" oninput="mark()"></div>
-    <div class="fg"><label>Value</label><input id="${id}-value" value="${esc(ch.value||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
-    <div class="fg"><label>FA Icon</label><input id="${id}-icon" value="${esc(ch.icon||'fas fa-star')}" oninput="mark()"></div>
+    <div class="fg"><label>Label</label><input id="${id}-label" value="${esc(ch.label||'')}" placeholder="e.g. Projects" oninput="mark()"></div>
+    <div class="fg"><label>Value</label><input id="${id}-value" value="${esc(ch.value||'')}" placeholder="e.g. 12+" oninput="updateCardTitle(this,'${id}');mark()"></div>
+    <div class="fg"><label>FA Icon</label><input id="${id}-icon" value="${esc(ch.icon||'fas fa-star')}" placeholder="fas fa-star" oninput="mark()"></div>
     <div class="fg"><label>Color</label>${iconBgSel(id+'-color',ch.color)}</div>
   </div>`;
 }
@@ -500,7 +500,7 @@ function populateSkills(type,arr){
     const id=`sk-${type}-${i}`;
     el.appendChild(makeCard(id,s.name||'Skill',
       `<div class="row2">
-        <div class="fg"><label>Skill Name</label><input id="${id}-name" value="${esc(s.name||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
+        <div class="fg"><label>Skill Name</label><input id="${id}-name" value="${esc(s.name||'')}" placeholder="e.g. Finite Element Analysis" oninput="updateCardTitle(this,'${id}');mark()"></div>
         <div class="fg"><label>Percent (0-100)</label><input type="number" id="${id}-pct" value="${esc(s.percent||0)}" min="0" max="100" oninput="mark()"></div>
       </div>`,null));
   });
@@ -510,7 +510,7 @@ function addSkill(type){
   const id=`sk-${type}-${Date.now()}`;
   el.appendChild(makeCard(id,'New Skill',
     `<div class="row2">
-      <div class="fg"><label>Skill Name</label><input id="${id}-name" value="" oninput="updateCardTitle(this,'${id}');mark()"></div>
+      <div class="fg"><label>Skill Name</label><input id="${id}-name" value="" placeholder="e.g. Finite Element Analysis" oninput="updateCardTitle(this,'${id}');mark()"></div>
       <div class="fg"><label>Percent (0-100)</label><input type="number" id="${id}-pct" value="70" min="0" max="100" oninput="mark()"></div>
     </div>`,null));
   mark();
@@ -522,14 +522,14 @@ function populateTools(arr){
   arr.forEach((t,i)=>{
     const id='tool-'+i;
     el.appendChild(makeCard(id,t||'Tool',
-      `<div class="fg"><label>Tool Name</label><input id="${id}-val" value="${esc(t||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
+      `<div class="fg"><label>Tool Name</label><input id="${id}-val" value="${esc(t||'')}" placeholder="e.g. ANSYS, MATLAB, SolidWorks" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
   });
 }
 function addTool(){
   const el=document.getElementById('tools-list');
   const id='tool-'+Date.now();
   el.appendChild(makeCard(id,'New Tool',
-    `<div class="fg"><label>Tool Name</label><input id="${id}-val" value="" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
+    `<div class="fg"><label>Tool Name</label><input id="${id}-val" value="" placeholder="e.g. ANSYS, MATLAB, SolidWorks" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
   mark();
 }
 
@@ -541,15 +541,15 @@ function populateProjects(arr){
 function projBody(id,p){
   const tags=(p.tags||[]).map((t,i)=>`
     <div class="row2" id="${id}-tag-${i}">
-      <div class="fg"><label>Tag Label</label><input id="${id}-tl-${i}" value="${esc(t.label||'')}" oninput="mark()"></div>
+      <div class="fg"><label>Tag Label</label><input id="${id}-tl-${i}" value="${esc(t.label||'')}" placeholder="e.g. Python, CFD, AI" oninput="mark()"></div>
       <div class="fg"><label>Color</label>${tagColorSel(id+'-tc-'+i,t.color)}</div>
     </div>`).join('');
   return `<div class="row2">
-    <div class="fg"><label>Project Number</label><input id="${id}-num" value="${esc(p.number||'')}"></div>
-    <div class="fg"><label>Date</label><input id="${id}-date" value="${esc(p.date||'')}"></div>
+    <div class="fg"><label>Project Number</label><input id="${id}-num" value="${esc(p.number||'')}" placeholder="#01" oninput="mark()"></div>
+    <div class="fg"><label>Date</label><input id="${id}-date" value="${esc(p.date||'')}" placeholder="Jan 2024 – Apr 2024" oninput="mark()"></div>
   </div>
-  <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(p.title||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
-  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3">${esc(p.description||'')}</textarea></div>
+  <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(p.title||'')}" placeholder="e.g. Autonomous Drone Navigation System" oninput="updateCardTitle(this,'${id}');mark()"></div>
+  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3" placeholder="Describe the project — what problem it solves, your role, and the outcome.">${esc(p.description||'')}</textarea></div>
   <div class="fg"><label>Project Image</label>
   <div class="upload-row">
     <div class="img-thumb" id="${id}-img-thumb">${p.image?`<img src="${esc(p.image)}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\'></i>'">`:'<i class="fas fa-image"></i>'}</div>
@@ -559,10 +559,10 @@ function projBody(id,p){
     </div>
   </div></div>
   <div class="row2">
-    <div class="fg"><label>GitHub URL</label><input id="${id}-gh" value="${esc(p.github_url||'')}"></div>
-    <div class="fg"><label>Demo URL</label><input id="${id}-demo" value="${esc(p.demo_url||'')}"></div>
-    <div class="fg"><label>Demo Label</label><input id="${id}-dlbl" value="${esc(p.demo_label||'Demo')}"></div>
-    <div class="fg"><label>Demo Icon (FA)</label><input id="${id}-dico" value="${esc(p.demo_icon||'fa-external-link-alt')}"></div>
+    <div class="fg"><label>GitHub URL</label><input id="${id}-gh" value="${esc(p.github_url||'')}" placeholder="https://github.com/yourname/project" oninput="mark()"></div>
+    <div class="fg"><label>Demo URL</label><input id="${id}-demo" value="${esc(p.demo_url||'')}" placeholder="https://your-demo-link.com" oninput="mark()"></div>
+    <div class="fg"><label>Demo Label</label><input id="${id}-dlbl" value="${esc(p.demo_label||'Demo')}" placeholder="Demo" oninput="mark()"></div>
+    <div class="fg"><label>Demo Icon (FA)</label><input id="${id}-dico" value="${esc(p.demo_icon||'fa-external-link-alt')}" placeholder="fa-external-link-alt" oninput="mark()"></div>
   </div>
   <div class="sec-label">Tags (max 3)</div>
   <div id="${id}-tags">${tags}</div>
@@ -579,7 +579,7 @@ function addProjTag(pid){
   const container=document.getElementById(pid+'-tags');
   const i=container.children.length;
   const div=document.createElement('div');div.className='row2';div.id=pid+'-tag-'+i;
-  div.innerHTML=`<div class="fg"><label>Tag Label</label><input id="${pid}-tl-${i}" value="" oninput="mark()"></div>
+  div.innerHTML=`<div class="fg"><label>Tag Label</label><input id="${pid}-tl-${i}" value="" placeholder="e.g. Python, CFD, AI" oninput="mark()"></div>
     <div class="fg"><label>Color</label>${tagColorSel(pid+'-tc-'+i,'cyan')}</div>`;
   container.appendChild(div);mark();
 }
@@ -591,12 +591,12 @@ function populateTimeline(type,arr){
 }
 function tlBody(id,it){
   return `<div class="row2">
-    <div class="fg"><label>Period</label><input id="${id}-period" value="${esc(it.period||'')}" oninput="mark()"></div>
+    <div class="fg"><label>Period</label><input id="${id}-period" value="${esc(it.period||'')}" placeholder="Sep 2020 – May 2024" oninput="mark()"></div>
     <div class="fg"><label>Dot Color</label>${dotSel(id+'-dot',it.dot||'cyan')}</div>
-    <div class="fg"><label>Role / Title</label><input id="${id}-role" value="${esc(it.role||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
-    <div class="fg"><label>Organisation</label><input id="${id}-org" value="${esc(it.org||'')}" oninput="mark()"></div>
+    <div class="fg"><label>Role / Title</label><input id="${id}-role" value="${esc(it.role||'')}" placeholder="e.g. Bachelor of Engineering" oninput="updateCardTitle(this,'${id}');mark()"></div>
+    <div class="fg"><label>Organisation</label><input id="${id}-org" value="${esc(it.org||'')}" placeholder="e.g. University of Cape Town" oninput="mark()"></div>
   </div>
-  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3">${esc(it.description||'')}</textarea></div>
+  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3" placeholder="Brief description of your programme, specialisation, or key activities.">${esc(it.description||'')}</textarea></div>
   ${linksBody(id, it.links||[])}`;
 }
 function addTimeline(type){
@@ -612,11 +612,11 @@ function populateCerts(arr){
 }
 function certBody(id,c){
   return `<div class="row2">
-    <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(c.title||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
-    <div class="fg"><label>Issuer</label><input id="${id}-issuer" value="${esc(c.issuer||'')}" oninput="mark()"></div>
-    <div class="fg"><label>FA Icon</label><input id="${id}-icon" value="${esc(c.icon||'fas fa-certificate')}" oninput="mark()"></div>
+    <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(c.title||'')}" placeholder="e.g. AWS Certified Solutions Architect" oninput="updateCardTitle(this,'${id}');mark()"></div>
+    <div class="fg"><label>Issuer</label><input id="${id}-issuer" value="${esc(c.issuer||'')}" placeholder="e.g. Amazon Web Services" oninput="mark()"></div>
+    <div class="fg"><label>FA Icon</label><input id="${id}-icon" value="${esc(c.icon||'fas fa-certificate')}" placeholder="fas fa-certificate" oninput="mark()"></div>
     <div class="fg"><label>Icon BG Color</label>${iconBgSel(id+'-bg',c.icon_bg||'cyan')}</div>
-    <div class="fg"><label>Badge Text</label><input id="${id}-badge" value="${esc(c.badge||'')}" oninput="mark()"></div>
+    <div class="fg"><label>Badge Text</label><input id="${id}-badge" value="${esc(c.badge||'')}" placeholder="e.g. 2024, Verified" oninput="mark()"></div>
     <div class="fg"><label>Badge Color</label>${iconBgSel(id+'-btype',c.badge_type||'cyan')}</div>
   </div>
   <div class="fg"><label>Certificate File (Image or PDF)</label>
@@ -642,14 +642,14 @@ function populateHonours(arr){
 }
 function honBody(id,h){
   return `<div class="row2">
-    <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(h.title||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
-    <div class="fg"><label>Year</label><input id="${id}-year" value="${esc(h.year||'')}" oninput="mark()"></div>
-    <div class="fg"><label>FA Icon</label><input id="${id}-icon" value="${esc(h.icon||'fas fa-trophy')}" oninput="mark()"></div>
+    <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(h.title||'')}" placeholder="e.g. Best Paper Award" oninput="updateCardTitle(this,'${id}');mark()"></div>
+    <div class="fg"><label>Year</label><input id="${id}-year" value="${esc(h.year||'')}" placeholder="2024" oninput="mark()"></div>
+    <div class="fg"><label>FA Icon</label><input id="${id}-icon" value="${esc(h.icon||'fas fa-trophy')}" placeholder="fas fa-trophy" oninput="mark()"></div>
     <div class="fg"><label>Icon BG Color</label>${iconBgSel(id+'-bg',h.icon_bg||'gold')}</div>
-    <div class="fg"><label>Badge Text</label><input id="${id}-badge" value="${esc(h.badge||'')}" oninput="mark()"></div>
+    <div class="fg"><label>Badge Text</label><input id="${id}-badge" value="${esc(h.badge||'')}" placeholder="e.g. National Level, First Place" oninput="mark()"></div>
     <div class="fg"><label>Badge Color</label>${iconBgSel(id+'-bcolor',h.badge_color||'gold')}</div>
   </div>
-  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="2">${esc(h.description||'')}</textarea></div>
+  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="2" placeholder="Brief description of this award — what it recognises and why it matters.">${esc(h.description||'')}</textarea></div>
   <div class="fg"><label>Award File (Image or PDF)</label>
   <div class="upload-row">
     <div class="img-thumb" id="${id}-file-thumb">${fileThumbInit(h.file_url)}</div>
@@ -672,16 +672,16 @@ function populatePubs(arr){
   arr.forEach((p,i)=>el.appendChild(makeCard('pub-'+i,p.title||'Publication',pubBody('pub-'+i,p),null)));
 }
 function pubBody(id,p){
-  return `<div class="fg"><label>Title</label><input id="${id}-title" value="${esc(p.title||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
+  return `<div class="fg"><label>Title</label><input id="${id}-title" value="${esc(p.title||'')}" placeholder="e.g. Deep Learning for Structural Health Monitoring" oninput="updateCardTitle(this,'${id}');mark()"></div>
   <div class="row2">
     <div class="fg"><label>Type</label>${pubTypeSel(id+'-type',p.type||'journal')}</div>
-    <div class="fg"><label>Year</label><input id="${id}-year" value="${esc(p.year||'')}" oninput="mark()"></div>
+    <div class="fg"><label>Year</label><input id="${id}-year" value="${esc(p.year||'')}" placeholder="2024" oninput="mark()"></div>
   </div>
-  <div class="fg"><label>Authors</label><input id="${id}-authors" value="${esc(p.authors||'')}" oninput="mark()"></div>
-  <div class="fg"><label>Venue / Journal</label><input id="${id}-venue" value="${esc(p.venue||'')}" oninput="mark()"></div>
+  <div class="fg"><label>Authors</label><input id="${id}-authors" value="${esc(p.authors||'')}" placeholder="A. Mehta, B. Singh, C. Patel" oninput="mark()"></div>
+  <div class="fg"><label>Venue / Journal</label><input id="${id}-venue" value="${esc(p.venue||'')}" placeholder="e.g. Journal of Structural Engineering, ICML 2024" oninput="mark()"></div>
   <div class="row2">
     <div class="fg"><label>Status</label>${pubStatusSel(id+'-status',p.status||'submitted')}</div>
-    <div class="fg"><label>DOI / URL</label><input id="${id}-doi" value="${esc(p.doi_url||'')}"></div>
+    <div class="fg"><label>DOI / URL</label><input id="${id}-doi" value="${esc(p.doi_url||'')}" placeholder="https://doi.org/10.1234/xyz" oninput="mark()"></div>
   </div>
   <div class="sec-label">Resource Link</div>
   <div class="row2">
@@ -701,14 +701,14 @@ function populatePatents(arr){
   arr.forEach((p,i)=>el.appendChild(makeCard('pat-'+i,p.title||'Patent',patBody('pat-'+i,p),null)));
 }
 function patBody(id,p){
-  return `<div class="fg"><label>Title</label><input id="${id}-title" value="${esc(p.title||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
+  return `<div class="fg"><label>Title</label><input id="${id}-title" value="${esc(p.title||'')}" placeholder="e.g. Smart Vibration Damping System for High-Speed Vehicles" oninput="updateCardTitle(this,'${id}');mark()"></div>
   <div class="row2">
     <div class="fg"><label>Accent Color</label><select id="${id}-accent"><option value="cyan"${p.accent==='cyan'?' selected':''}>cyan</option><option value="orange"${p.accent==='orange'?' selected':''}>orange</option></select></div>
-    <div class="fg"><label>Patent Number</label><input id="${id}-num" value="${esc(p.number||'')}" oninput="mark()"></div>
-    <div class="fg"><label>Filed Date</label><input id="${id}-filed" value="${esc(p.filed||'')}" oninput="mark()"></div>
-    <div class="fg"><label>Tag / Category</label><input id="${id}-tag" value="${esc(p.tag||'')}" oninput="mark()"></div>
+    <div class="fg"><label>Patent Number</label><input id="${id}-num" value="${esc(p.number||'')}" placeholder="e.g. IN 123456" oninput="mark()"></div>
+    <div class="fg"><label>Filed Date</label><input id="${id}-filed" value="${esc(p.filed||'')}" placeholder="e.g. March 2024" oninput="mark()"></div>
+    <div class="fg"><label>Tag / Category</label><input id="${id}-tag" value="${esc(p.tag||'')}" placeholder="e.g. Mechanical, Aerospace" oninput="mark()"></div>
   </div>
-  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3">${esc(p.description||'')}</textarea></div>
+  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3" placeholder="Describe the invention — the problem it solves, the technology involved, and its impact.">${esc(p.description||'')}</textarea></div>
   <div class="fg"><label>Patent Document (Image or PDF)</label>
   <div class="upload-row">
     <div class="img-thumb" id="${id}-file-thumb">${fileThumbInit(p.file_url)}</div>
@@ -732,13 +732,13 @@ function populateServices(arr){
 }
 function svcBody(id,s){
   return `<div class="row2">
-    <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(s.title||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
-    <div class="fg"><label>FA Icon</label><input id="${id}-icon" value="${esc(s.icon||'fas fa-cog')}" oninput="mark()"></div>
+    <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(s.title||'')}" placeholder="e.g. CAD Modelling & Simulation" oninput="updateCardTitle(this,'${id}');mark()"></div>
+    <div class="fg"><label>FA Icon</label><input id="${id}-icon" value="${esc(s.icon||'fas fa-cog')}" placeholder="fas fa-cog" oninput="mark()"></div>
     <div class="fg"><label>Icon BG Color</label>${iconBgSel(id+'-bg',s.icon_bg||'cyan')}</div>
-    <div class="fg"><label>Meta Icon (FA)</label><input id="${id}-mico" value="${esc(s.meta_icon||'fas fa-clock')}" oninput="mark()"></div>
-    <div class="fg" style="grid-column:1/-1"><label>Meta Text</label><input id="${id}-meta" value="${esc(s.meta||'')}" oninput="mark()"></div>
+    <div class="fg"><label>Meta Icon (FA)</label><input id="${id}-mico" value="${esc(s.meta_icon||'fas fa-clock')}" placeholder="fas fa-clock" oninput="mark()"></div>
+    <div class="fg" style="grid-column:1/-1"><label>Meta Text</label><input id="${id}-meta" value="${esc(s.meta||'')}" placeholder="e.g. Available · Remote · Freelance" oninput="mark()"></div>
   </div>
-  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="2">${esc(s.description||'')}</textarea></div>`;
+  <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="2" placeholder="What this service includes — tools, deliverables, and who it's for.">${esc(s.description||'')}</textarea></div>`;
 }
 function addService(){
   const el=document.getElementById('services-list');
@@ -752,13 +752,13 @@ function populateBrkBullets(arr){
   arr.forEach((b,i)=>{
     const id='brkb-'+i;
     el.appendChild(makeCard(id,b||'Bullet',
-      `<div class="fg"><label>Bullet Text</label><input id="${id}-val" value="${esc(b||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
+      `<div class="fg"><label>Bullet Text</label><input id="${id}-val" value="${esc(b||'')}" placeholder="e.g. Completed Google Data Analytics Certificate" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
   });
 }
 function addBrkBullet(){
   const el=document.getElementById('brk-bullets');const id='brkb-'+Date.now();
   el.appendChild(makeCard(id,'New Bullet',
-    `<div class="fg"><label>Bullet Text</label><input id="${id}-val" value="" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
+    `<div class="fg"><label>Bullet Text</label><input id="${id}-val" value="" placeholder="e.g. Completed Google Data Analytics Certificate" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
   mark();
 }
 function populateBrkOutcomes(arr){
@@ -767,8 +767,8 @@ function populateBrkOutcomes(arr){
     const id='brko-'+i;
     el.appendChild(makeCard(id,o.label||'Outcome',
       `<div class="row2">
-        <div class="fg"><label>Value</label><input id="${id}-val" value="${esc(o.value||'')}" oninput="mark()"></div>
-        <div class="fg"><label>Label</label><input id="${id}-label" value="${esc(o.label||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
+        <div class="fg"><label>Value</label><input id="${id}-val" value="${esc(o.value||'')}" placeholder="e.g. 3" oninput="mark()"></div>
+        <div class="fg"><label>Label</label><input id="${id}-label" value="${esc(o.label||'')}" placeholder="e.g. Courses Completed" oninput="updateCardTitle(this,'${id}');mark()"></div>
       </div>`,null));
   });
 }
@@ -776,8 +776,8 @@ function addBrkOutcome(){
   const el=document.getElementById('brk-outcomes');const id='brko-'+Date.now();
   el.appendChild(makeCard(id,'New Outcome',
     `<div class="row2">
-      <div class="fg"><label>Value</label><input id="${id}-val" value="" oninput="mark()"></div>
-      <div class="fg"><label>Label</label><input id="${id}-label" value="" oninput="updateCardTitle(this,'${id}');mark()"></div>
+      <div class="fg"><label>Value</label><input id="${id}-val" value="" placeholder="e.g. 3" oninput="mark()"></div>
+      <div class="fg"><label>Label</label><input id="${id}-label" value="" placeholder="e.g. Courses Completed" oninput="updateCardTitle(this,'${id}');mark()"></div>
     </div>`,null));
   mark();
 }
