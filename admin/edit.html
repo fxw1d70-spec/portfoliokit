@@ -74,6 +74,18 @@ a{text-decoration:none;color:inherit}
 .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg1);border:1px solid var(--border);border-radius:10px;padding:.75rem 1.2rem;font-size:.85rem;display:flex;align-items:center;gap:.6rem;box-shadow:0 10px 40px rgba(0,0,0,.5);z-index:900;transform:translateY(16px);opacity:0;transition:var(--ease);pointer-events:none}
 .toast.show{transform:translateY(0);opacity:1}.toast.ok i{color:var(--green)}.toast.err i{color:var(--red)}
 @media(max-width:768px){.tabs-side{display:none}.content{padding:1.2rem}}
+/* FILE UPLOAD */
+.upload-row{display:flex;gap:.85rem;align-items:flex-start}
+.upload-col{flex:1;display:flex;flex-direction:column;gap:.5rem}
+.upload-col input[type=text],.upload-col input:not([type]){width:100%}
+.img-thumb{width:70px;height:70px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:1.2rem}
+.img-thumb img{width:100%;height:100%;object-fit:cover;object-position:top}
+.upload-btn{display:inline-flex;align-items:center;gap:.45rem;padding:.38rem .9rem;background:rgba(255,255,255,.03);border:1px dashed var(--border);border-radius:7px;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--ease);width:fit-content;position:relative;overflow:hidden}
+.upload-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.04)}
+.upload-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.upload-btn.uploading{color:var(--cyan);border-style:solid}
+.file-link{font-size:.75rem;color:var(--cyan);display:inline-flex;align-items:center;gap:.35rem;margin-top:.1rem}
+.file-link:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -113,7 +125,16 @@ a{text-decoration:none;color:inherit}
         <div class="fg"><label>Full Name</label><input id="p-name" placeholder="Arjun Mehta"></div>
         <div class="fg"><label>Initials (2 chars)</label><input id="p-initials" placeholder="AM" maxlength="3"></div>
       </div>
-      <div class="fg"><label>Photo URL</label><input id="p-photo" placeholder="https://randomuser.me/api/portraits/men/75.jpg"></div>
+      <div class="fg">
+        <label>Profile Photo</label>
+        <div class="upload-row">
+          <div class="img-thumb" id="p-photo-thumb"><i class="fas fa-image"></i></div>
+          <div class="upload-col">
+            <input id="p-photo" placeholder="Paste photo URL, or upload below" oninput="syncImgThumb('p-photo','p-photo-thumb');mark()">
+            <label class="upload-btn"><i class="fas fa-upload"></i> Upload from device<input type="file" accept="image/*" onchange="uploadImg(this,'p-photo','p-photo-thumb','photo')"></label>
+          </div>
+        </div>
+      </div>
       <div class="row2">
         <div class="fg"><label>Headline / Title</label><input id="p-headline" placeholder="Mechanical Engineering Undergrad"></div>
         <div class="fg"><label>Availability Badge</label><input id="p-availability" placeholder="Open to Internships & Research"></div>
@@ -163,7 +184,14 @@ a{text-decoration:none;color:inherit}
         <div class="fg"><label>GitHub Display</label><input id="c-github"></div>
         <div class="fg"><label>GitHub URL</label><input id="c-github-url" type="url"></div>
       </div>
-      <div class="fg"><label>CV / Resume URL</label><input id="c-cv" type="url"></div>
+      <div class="fg">
+        <label>CV / Resume</label>
+        <div class="upload-col">
+          <input id="c-cv" placeholder="Paste URL, or upload below" oninput="syncCvLink();mark()">
+          <label class="upload-btn"><i class="fas fa-file-pdf"></i> Upload PDF / Doc<input type="file" accept=".pdf,.doc,.docx,.odt" onchange="uploadDoc(this,'c-cv','c-cv-link','cv')"></label>
+          <a id="c-cv-link" href="#" target="_blank" class="file-link" style="display:none"><i class="fas fa-external-link-alt"></i> View current CV</a>
+        </div>
+      </div>
 
       <div class="sec-label" style="margin-top:1.5rem">Hero Stats (4 items)</div>
       <div id="stats-list" class="card-list"></div>
@@ -360,7 +388,7 @@ async function loadPortfolio(){
 function populateAll(){
   const p=DATA.profile||{},ab=p.about||{},det=ab.details||{},c=DATA.contact||{};
   // Profile
-  sv('p-name',p.name);sv('p-initials',p.initials);sv('p-photo',p.photo);
+  sv('p-name',p.name);sv('p-initials',p.initials);sv('p-photo',p.photo);syncImgThumb('p-photo','p-photo-thumb');
   sv('p-headline',p.headline);sv('p-availability',p.availability);sv('p-tagline',p.tagline);
   populateRoles(p.roles||[]);
   populateChips(p.chips||[]);
@@ -372,7 +400,7 @@ function populateAll(){
   // Contact
   sv('c-email',c.email);sv('c-phone',c.phone);
   sv('c-linkedin',c.linkedin);sv('c-linkedin-url',c.linkedin_url);
-  sv('c-github',c.github);sv('c-github-url',c.github_url);sv('c-cv',c.cv_url);
+  sv('c-github',c.github);sv('c-github-url',c.github_url);sv('c-cv',c.cv_url);syncCvLink();
   populateStats(DATA.stats||[]);
   // Skills
   populateSkills('core',DATA.skills?.core||[]);
@@ -518,7 +546,14 @@ function projBody(id,p){
   </div>
   <div class="fg"><label>Title</label><input id="${id}-title" value="${esc(p.title||'')}" oninput="updateCardTitle(this,'${id}');mark()"></div>
   <div class="fg"><label>Description</label><textarea id="${id}-desc" rows="3">${esc(p.description||'')}</textarea></div>
-  <div class="fg"><label>Image URL</label><input id="${id}-img" value="${esc(p.image||'')}"></div>
+  <div class="fg"><label>Project Image</label>
+  <div class="upload-row">
+    <div class="img-thumb" id="${id}-img-thumb">${p.image?`<img src="${esc(p.image)}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\'></i>'">`:'<i class="fas fa-image"></i>'}</div>
+    <div class="upload-col">
+      <input id="${id}-img" value="${esc(p.image||'')}" placeholder="Paste URL, or upload below" oninput="syncImgThumb('${id}-img','${id}-img-thumb');mark()">
+      <label class="upload-btn"><i class="fas fa-upload"></i> Upload image<input type="file" accept="image/*" onchange="uploadImg(this,'${id}-img','${id}-img-thumb','projects')"></label>
+    </div>
+  </div></div>
   <div class="row2">
     <div class="fg"><label>GitHub URL</label><input id="${id}-gh" value="${esc(p.github_url||'')}"></div>
     <div class="fg"><label>Demo URL</label><input id="${id}-demo" value="${esc(p.demo_url||'')}"></div>
@@ -863,6 +898,82 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();savePortfolio();}
 });
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+
+/* ── FILE UPLOADS ──────────────────────────────────────── */
+async function uploadToStorage(file, folder) {
+  const { data: { session } } = await supa.auth.getSession();
+  if (!session) throw new Error('Not authenticated');
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `${session.user.id}/${folder}-${Date.now()}.${ext}`;
+  const { error } = await supa.storage
+    .from('portfolio-assets')
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (error) throw error;
+  const { data: { publicUrl } } = supa.storage
+    .from('portfolio-assets')
+    .getPublicUrl(path);
+  return publicUrl;
+}
+
+async function uploadImg(input, urlId, thumbId, folder) {
+  const file = input.files[0];
+  if (!file) return;
+  const btn = input.closest('.upload-btn');
+  const orig = btn.innerHTML;
+  btn.classList.add('uploading');
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Uploading…';
+  try {
+    const url = await uploadToStorage(file, folder);
+    document.getElementById(urlId).value = url;
+    syncImgThumb(urlId, thumbId);
+    mark();
+    toast('Image uploaded!', 'ok');
+  } catch (e) {
+    toast('Upload failed: ' + e.message, 'err');
+  } finally {
+    btn.innerHTML = orig;
+    btn.classList.remove('uploading');
+    input.value = '';
+  }
+}
+
+async function uploadDoc(input, urlId, linkId, folder) {
+  const file = input.files[0];
+  if (!file) return;
+  const btn = input.closest('.upload-btn');
+  const orig = btn.innerHTML;
+  btn.classList.add('uploading');
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Uploading…';
+  try {
+    const url = await uploadToStorage(file, folder);
+    document.getElementById(urlId).value = url;
+    const lnk = document.getElementById(linkId);
+    if (lnk) { lnk.href = url; lnk.style.display = 'inline-flex'; }
+    mark();
+    toast('CV uploaded!', 'ok');
+  } catch (e) {
+    toast('Upload failed: ' + e.message, 'err');
+  } finally {
+    btn.innerHTML = orig;
+    btn.classList.remove('uploading');
+    input.value = '';
+  }
+}
+
+function syncImgThumb(urlId, thumbId) {
+  const url = document.getElementById(urlId)?.value?.trim();
+  const thumb = document.getElementById(thumbId);
+  if (!thumb) return;
+  thumb.innerHTML = url
+    ? `<img src="${url}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\'></i>'">`
+    : '<i class="fas fa-image"></i>';
+}
+
+function syncCvLink() {
+  const url = document.getElementById('c-cv')?.value?.trim();
+  const lnk = document.getElementById('c-cv-link');
+  if (lnk) { lnk.style.display = url ? 'inline-flex' : 'none'; if (url) lnk.href = url; }
+}
 
 /* ── BOOT ─────────────────────────────────────────────── */
 loadPortfolio();
