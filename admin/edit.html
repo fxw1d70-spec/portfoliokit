@@ -220,18 +220,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="sec-label" style="margin-top:1.5rem">Software & Tools (chips)</div>
       <div id="tools-list" class="card-list"></div>
       <button class="add-btn" onclick="addTool()"><i class="fas fa-plus"></i> Add Tool</button>
+
+      <div class="sec-label" style="margin-top:1.5rem">Soft Skills</div>
+      <div id="soft-skills-list" class="card-list"></div>
+      <button class="add-btn" onclick="addSoftSkill()"><i class="fas fa-plus"></i> Add Soft Skill</button>
     </div>
 
     <!-- PROJECTS -->
     <div class="panel" id="tab-projects">
-      <div class="panel-title">Projects</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+        <div class="panel-title" style="margin-bottom:0">Projects</div>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearSection('projects-list','projects')"><i class="fas fa-trash-can"></i> Clear all</button>
+      </div>
       <div id="projects-list" class="card-list"></div>
       <button class="add-btn" onclick="addProject()"><i class="fas fa-plus"></i> Add Project</button>
     </div>
 
     <!-- EDUCATION -->
     <div class="panel" id="tab-education">
-      <div class="panel-title">Education Timeline</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+        <div class="panel-title" style="margin-bottom:0">Education Timeline</div>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearSection('education-list','education')"><i class="fas fa-trash-can"></i> Clear all</button>
+      </div>
       <div id="education-list" class="card-list"></div>
       <button class="add-btn" onclick="addTimeline('education')"><i class="fas fa-plus"></i> Add Entry</button>
     </div>
@@ -239,7 +249,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <!-- CERTS & HONOURS -->
     <div class="panel" id="tab-certs">
       <div class="panel-title">Certifications & Honours</div>
-      <div class="sec-label">Certifications</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <div class="sec-label" style="margin-bottom:0">Certifications</div>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearSection('certs-list','certifications')"><i class="fas fa-trash-can"></i> Clear all</button>
+      </div>
       <div id="certs-list" class="card-list"></div>
       <button class="add-btn" onclick="addCert()"><i class="fas fa-plus"></i> Add Certification</button>
 
@@ -454,6 +467,7 @@ function populateAll(){
   populateSkills('core',DATA.skills?.core||[]);
   populateSkills('computational',DATA.skills?.computational||[]);
   populateTools(DATA.skills?.tools||[]);
+  populateSoftSkills(DATA.skills?.soft||[]);
   // Projects
   populateProjects(DATA.projects||[]);
   // Education
@@ -563,6 +577,16 @@ function addSkill(type){
   mark();
 }
 
+/* ── CLEAR SECTION ──────────────────────────────────────── */
+function clearSection(listId,label){
+  const el=document.getElementById(listId);
+  if(!el||!el.children.length){toast('Section is already empty.','ok');return;}
+  if(!window.confirm(`Remove all ${label||''} entries? This cannot be undone until you save.`))return;
+  el.innerHTML='';
+  mark();
+  toast('Entries cleared — click Save to apply.','ok');
+}
+
 /* ── TOOLS ─────────────────────────────────────────────── */
 function populateTools(arr){
   const el=document.getElementById('tools-list');el.innerHTML='';
@@ -577,6 +601,23 @@ function addTool(){
   const id='tool-'+Date.now();
   el.appendChild(makeCard(id,'New Tool',
     `<div class="fg"><label>Tool Name</label><input id="${id}-val" value="" placeholder="e.g. ANSYS, MATLAB, SolidWorks" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
+  mark();
+}
+
+/* ── SOFT SKILLS ─────────────────────────────────────────── */
+function populateSoftSkills(arr){
+  const el=document.getElementById('soft-skills-list');el.innerHTML='';
+  arr.forEach((s,i)=>{
+    const id='soft-'+i;
+    el.appendChild(makeCard(id,s||'Skill',
+      `<div class="fg"><label>Skill Name</label><input id="${id}-val" value="${esc(s||'')}" placeholder="e.g. Leadership, Communication, Problem Solving" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
+  });
+}
+function addSoftSkill(){
+  const el=document.getElementById('soft-skills-list');
+  const id='soft-'+Date.now();
+  el.appendChild(makeCard(id,'New Soft Skill',
+    `<div class="fg"><label>Skill Name</label><input id="${id}-val" value="" placeholder="e.g. Leadership, Communication, Problem Solving" oninput="updateCardTitle(this,'${id}');mark()"></div>`,null));
   mark();
 }
 
@@ -619,8 +660,11 @@ function projBody(id,p){
 function addProject(){
   const el=document.getElementById('projects-list');
   const id='proj-'+Date.now();
-  const p={title:'New Project',number:'#0'+(el.children.length+1),date:'',description:'',image:'https://picsum.photos/seed/'+id+'/600/400',github_url:'#',demo_url:'#',demo_label:'Demo',demo_icon:'fa-external-link-alt',tags:[]};
-  el.appendChild(makeCard(id,p.title,projBody(id,p),null));mark();
+  const p={title:'',number:'',date:'',description:'',image:'',github_url:'',demo_url:'',demo_label:'Demo',demo_icon:'fa-external-link-alt',tags:[]};
+  const card=makeCard(id,'New Project',projBody(id,p),null);
+  el.appendChild(card);
+  toggleCard(id);
+  mark();
 }
 function addProjTag(pid){
   const container=document.getElementById(pid+'-tags');
@@ -871,6 +915,7 @@ function collectAll(){
     const id=c.id.replace('card-','');return {name:gv(id+'-name'),percent:parseInt(gv(id+'-pct'))||0};
   });
   const tools=collectSimpleList('tools-list','val');
+  const softSkills=collectSimpleList('soft-skills-list','val');
   const projects=[...document.querySelectorAll('#projects-list .list-card')].map(c=>{
     const id=c.id.replace('card-','');
     const tagContainer=document.getElementById(id+'-tags');
@@ -928,7 +973,7 @@ function collectAll(){
     contact:{email:v('c-email'),phone:v('c-phone'),linkedin:v('c-linkedin'),linkedin_url:v('c-linkedin-url'),
       github:v('c-github'),github_url:v('c-github-url'),cv_url:v('c-cv')},
     stats,
-    skills:{core:coreSkills,computational:compSkills,tools},
+    skills:{core:coreSkills,computational:compSkills,tools,soft:softSkills},
     projects,
     education:tlCollect('education-list'),
     certifications:certs,

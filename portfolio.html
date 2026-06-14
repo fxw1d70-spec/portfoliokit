@@ -418,6 +418,7 @@ function rAbout(d){
 
 function rSkills(d){
   const sk=d.skills||{};
+  if(!(sk.core||[]).length&&!(sk.computational||[]).length&&!(sk.tools||[]).length&&!(sk.soft||[]).length) return '';
   const bar=(s,i,two)=>`<div class="sk rv d${Math.min(i+1,4)}">
     <div class="sk-row"><span class="sk-name">${esc(s.name)}</span>
     <span class="sk-pct${two?' two':''}">${s.percent}%</span></div>
@@ -425,14 +426,17 @@ function rSkills(d){
   const cores=(sk.core||[]).map((s,i)=>bar(s,i,false)).join('');
   const comps=(sk.computational||[]).map((s,i)=>bar(s,i,true)).join('');
   const tools=(sk.tools||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+  const softs=(sk.soft||[]).map(s=>`<span class="chip" style="border-color:rgba(167,139,250,.3);color:var(--purple)"><i class="fas fa-check" style="font-size:.65rem"></i> ${esc(s)}</span>`).join('');
   return `<section class="skills-bg" id="skills"><div class="wrap">
     ${secHead('// EXPERTISE','Technical','Skills','A toolkit honed through coursework, projects, and competition')}
-    <div class="skills-grid">
-      <div class="rv-l"><div class="skill-group-title">Engineering Core</div>${cores}</div>
-      <div class="rv-r"><div class="skill-group-title">Computational & Programming</div>${comps}</div>
-    </div>
-    <div class="tools-wrap rv"><div class="tools-label">Software & Tools</div>
-    <div class="chips">${tools}</div></div>
+    ${(cores||comps)?`<div class="skills-grid">
+      ${cores?`<div class="rv-l"><div class="skill-group-title">Engineering Core</div>${cores}</div>`:''}
+      ${comps?`<div class="rv-r"><div class="skill-group-title">Computational & Programming</div>${comps}</div>`:''}
+    </div>`:''}
+    ${tools?`<div class="tools-wrap rv"><div class="tools-label">Software & Tools</div>
+    <div class="chips">${tools}</div></div>`:''}
+    ${softs?`<div class="tools-wrap rv" style="margin-top:2rem"><div class="tools-label">Soft Skills</div>
+    <div class="chips">${softs}</div></div>`:''}
   </div></section>`;
 }
 
@@ -445,8 +449,8 @@ function rProjects(d){
         <div class="proj-img-ov"></div>
         <div class="proj-num">${esc(p.number)}</div>
         <div class="proj-hover-ov">
-          <a href="${esc(p.github_url)}" class="ov-btn ov-btn-p"><i class="fab fa-github"></i> Code</a>
-          <a href="${esc(p.demo_url)}"   class="ov-btn ov-btn-s"><i class="fas ${esc(p.demo_icon||'fa-external-link-alt')}"></i> ${esc(p.demo_label||'Demo')}</a>
+          ${p.github_url?`<a href="${esc(p.github_url)}" class="ov-btn ov-btn-p" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> Code</a>`:''}
+          ${p.demo_url?`<a href="${esc(p.demo_url)}" class="ov-btn ov-btn-s" target="_blank" rel="noopener noreferrer"><i class="fas ${esc(p.demo_icon||'fa-external-link-alt')}"></i> ${esc(p.demo_label||'Demo')}</a>`:''}
         </div>
       </div>
       <div class="proj-body">
@@ -456,8 +460,8 @@ function rProjects(d){
         ${renderExtLinks(p.links)}
         <div class="proj-foot">
           <div class="proj-links">
-            <a href="${esc(p.github_url)}" class="proj-lnk"><i class="fab fa-github"></i> GitHub</a>
-            <a href="${esc(p.demo_url)}"   class="proj-lnk"><i class="fas ${esc(p.demo_icon||'fa-external-link-alt')}"></i> ${esc(p.demo_label||'Demo')}</a>
+            ${p.github_url?`<a href="${esc(p.github_url)}" class="proj-lnk" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>`:''}
+            ${p.demo_url?`<a href="${esc(p.demo_url)}" class="proj-lnk" target="_blank" rel="noopener noreferrer"><i class="fas ${esc(p.demo_icon||'fa-external-link-alt')}"></i> ${esc(p.demo_label||'Demo')}</a>`:''}
           </div>
           <span class="proj-date">${esc(p.date)}</span>
         </div>
@@ -700,7 +704,7 @@ function buildNav(d){
   document.getElementById('nav-logo').textContent=(p.initials||'??')+'.';
   document.title=`${p.name||'Portfolio'} — ${p.headline||''}`;
   const links=[['#home','Home'],['#about','About']];
-  if((sk.core||[]).length||(sk.computational||[]).length||(sk.tools||[]).length) links.push(['#skills','Skills']);
+  if((sk.core||[]).length||(sk.computational||[]).length||(sk.tools||[]).length||(sk.soft||[]).length) links.push(['#skills','Skills']);
   if((d.projects||[]).length)        links.push(['#projects','Projects']);
   if((d.education||[]).length)       links.push(['#education','Education']);
   if((d.certifications||[]).length)  links.push(['#certifications','Certifications']);
