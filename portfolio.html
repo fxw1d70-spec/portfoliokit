@@ -197,20 +197,13 @@ section{padding:7rem 3rem}.wrap{max-width:1280px;margin:0 auto}
 .brk-outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.8rem;padding-top:1.8rem;border-top:1px solid var(--border)}
 .brk-out{text-align:center}.brk-out-n{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:800;color:var(--gold);display:block;line-height:1}.brk-out-l{font-size:.76rem;color:var(--muted);margin-top:.3rem}
 /* CONTACT */
-.contact-bg{background:var(--bg-0)}.contact-grid{display:grid;grid-template-columns:1fr 1.55fr;gap:4.5rem;align-items:start}
+.contact-bg{background:var(--bg-0)}
 .contact-left h3{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700;letter-spacing:-.5px;margin-bottom:1rem;line-height:1.25}.contact-left p{color:var(--muted);line-height:1.85;margin-bottom:2rem;font-size:.95rem}
 .contact-list{display:flex;flex-direction:column;gap:.85rem}
 .c-item{display:flex;align-items:center;gap:1rem;padding:.95rem 1.2rem;background:var(--card);border:1px solid var(--border);border-radius:12px;transition:var(--ease)}.c-item:hover{border-color:var(--cyan);transform:translateX(7px)}
 .c-ico{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.95rem}
 .c-text .c-lbl{font-size:.7rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:.15rem}.c-text .c-val{font-size:.88rem;font-weight:500}
 .c-arrow{margin-left:auto;color:var(--dim);font-size:.78rem;transition:var(--ease)}.c-item:hover .c-arrow{color:var(--cyan)}
-.form-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:2.4rem;backdrop-filter:blur(10px)}
-.form-box h3{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:700;margin-bottom:1.75rem}
-.f-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.fg{margin-bottom:1.4rem}
-.fg label{display:block;font-size:.82rem;font-weight:500;color:var(--muted);margin-bottom:.45rem}
-.fg input,.fg textarea{width:100%;padding:.8rem 1.1rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:.88rem;transition:var(--ease);outline:none;resize:none}
-.fg input:focus,.fg textarea:focus{border-color:var(--cyan);background:rgba(0,212,255,.025);box-shadow:0 0 0 3px rgba(0,212,255,.1)}
-.fg input::placeholder,.fg textarea::placeholder{color:var(--dim)}.fg textarea{min-height:125px}
 /* FOOTER */
 footer{background:var(--bg-1);border-top:1px solid var(--border);padding:2rem 3rem}
 .foot-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
@@ -239,8 +232,8 @@ footer{background:var(--bg-1);border-top:1px solid var(--border);padding:2rem 3r
   .hero-right{display:none}.hero-btns,.hero-socials{justify-content:center}.hero-desc{margin:0 auto 2rem}
   .about-grid{grid-template-columns:1fr}.about-img-side{display:none}
   .skills-grid{grid-template-columns:1fr}.projects-grid{grid-template-columns:1fr}
-  .certs-grid{grid-template-columns:1fr}.contact-grid{grid-template-columns:1fr}
-  .stats-inner{grid-template-columns:repeat(2,1fr)}.f-row{grid-template-columns:1fr}
+  .certs-grid{grid-template-columns:1fr}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
   .pat-grid{grid-template-columns:1fr}.svc-grid{grid-template-columns:1fr}.brk-outcomes{grid-template-columns:1fr 1fr}
   .foot-inner{flex-direction:column;text-align:center}
 }
@@ -507,14 +500,15 @@ function rCerts(d){
       </div>
     </div>`).join('');
   return `<section class="certs-bg" id="certifications"><div class="wrap">
-    ${secHead('// CREDENTIALS','Certifications &amp;','Achievements','')}
+    ${secHead('// CREDENTIALS','Certifications and','Achievements','')}
     <div class="certs-grid">${cards}</div>
   </div></section>`;
 }
 
 function rHonours(d){
-  if(!(d.honours||[]).length) return '';
-  const rows=d.honours.map((h,i)=>`
+  const honours=(d.honours||[]).filter(h=>(h.title||'').trim());
+  if(!honours.length) return '';
+  const rows=honours.map((h,i)=>`
     <div class="aw-item rv d${Math.min(i+1,4)}">
       <div class="aw-ico" style="${cIco(h.icon_bg)}"><i class="${esc(h.icon)}"></i></div>
       <div class="aw-text"><h4>${esc(h.title)}</h4><p>${esc(h.description)}</p></div>
@@ -523,7 +517,7 @@ function rHonours(d){
       ${(h.file_url||(h.links||[]).length)?`<div style="width:100%;display:flex;flex-wrap:wrap;gap:.45rem;padding-top:.6rem;border-top:1px solid var(--border)">${fileViewBtn(h.file_url,'View Award')}${(h.links||[]).filter(l=>l.url).map(l=>{const m=detectLinkMeta(l.url);return`<a href="${esc(l.url)}" target="_blank" rel="noopener" class="ext-pill"><i class="${m.icon}" style="color:${m.color}"></i>${esc(l.label||'Link')}</a>`;}).join('')}</div>`:''}
     </div>`).join('');
   return `<section class="hon-bg" id="honours"><div class="wrap">
-    ${secHead('// RECOGNITION','Honours &amp;','Awards','Academic distinctions and competition victories')}
+    ${secHead('// RECOGNITION','Honours and','Awards','Academic distinctions and competition victories')}
     <div class="awards-list">${rows}</div>
   </div></section>`;
 }
@@ -546,14 +540,15 @@ function rPubs(d){
       </div>
     </div>`).join('');
   return `<section class="pub-bg" id="publications"><div class="wrap">
-    ${secHead('// RESEARCH','Publications &amp;','Papers','Peer-reviewed research contributions')}
+    ${secHead('// RESEARCH','Publications and','Papers','Peer-reviewed research contributions')}
     <div class="pub-list">${items}</div>
   </div></section>`;
 }
 
 function rPatents(d){
-  if(!(d.patents||[]).length) return '';
-  const cards=d.patents.map((p,i)=>`
+  const patents=(d.patents||[]).filter(p=>(p.title||'').trim());
+  if(!patents.length) return '';
+  const cards=patents.map((p,i)=>`
     <div class="pat-card ${p.accent==='orange'?'pat-o':'pat-c'} rv d${Math.min(i+1,4)}">
       <div class="pat-pill"><i class="fas fa-clock"></i> Application Pending</div>
       <div class="pat-num">${esc(p.number)}</div>
@@ -563,7 +558,7 @@ function rPatents(d){
       ${(p.file_url||(p.links||[]).length)?`<div class="ext-links" style="margin-top:.6rem;padding-top:.7rem;border-top:1px solid var(--border)">${fileViewBtn(p.file_url,'View Patent')}${(p.links||[]).filter(l=>l.url).map(l=>{const m=detectLinkMeta(l.url);return`<a href="${esc(l.url)}" target="_blank" rel="noopener" class="ext-pill"><i class="${m.icon}" style="color:${m.color}"></i>${esc(l.label||'Link')}</a>`;}).join('')}</div>`:''}
     </div>`).join('');
   return `<section class="pat-bg" id="patents"><div class="wrap">
-    ${secHead('// INTELLECTUAL PROPERTY','Patents &amp;','Inventions','Novel engineering innovations filed with the Indian Patent Office')}
+    ${secHead('// INTELLECTUAL PROPERTY','Patents and','Inventions','Novel engineering innovations filed with the Indian Patent Office')}
     <div class="pat-grid">${cards}</div>
   </div></section>`;
 }
@@ -578,7 +573,7 @@ function rServices(d){
       <div class="svc-meta"><i class="${esc(s.meta_icon)}"></i>${esc(s.meta)}</div>
     </div>`).join('');
   return `<section class="svc-bg" id="services"><div class="wrap">
-    ${secHead('// PROFESSIONAL SERVICES','Services &amp;','Contributions','Roles in the wider academic and technical community')}
+    ${secHead('// PROFESSIONAL SERVICES','Services and','Contributions','Roles in the wider academic and technical community')}
     <div class="svc-grid">${cards}</div>
   </div></section>`;
 }
@@ -612,49 +607,33 @@ function rContact(d){
   const ghUrl=extUrl(c.github_url,c.github);
   return `<section class="contact-bg" id="contact"><div class="wrap">
     ${secHead('// LET\'S CONNECT','Get In','Touch','Open to internships, research collaborations, and exciting engineering projects')}
-    <div class="contact-grid">
-      <div class="rv-l">
-        <div class="contact-left">
-          <h3>Let's build something<br>great together.</h3>
-          <p>Whether you have an internship opportunity, want to collaborate on a technical project, or just want to talk engineering — I'd love to hear from you.</p>
-        </div>
-        <div class="contact-list">
-          <a href="mailto:${esc(c.email)}" class="c-item">
-            <div class="c-ico" style="background:rgba(0,212,255,.1);color:var(--cyan)"><i class="fas fa-envelope"></i></div>
-            <div class="c-text"><div class="c-lbl">Email</div><div class="c-val">${esc(c.email)}</div></div>
-            <i class="fas fa-arrow-right c-arrow"></i>
-          </a>
-          <a href="tel:${esc(c.phone)}" class="c-item">
-            <div class="c-ico" style="background:rgba(255,107,53,.1);color:var(--orange)"><i class="fas fa-phone"></i></div>
-            <div class="c-text"><div class="c-lbl">Phone / WhatsApp</div><div class="c-val">${esc(c.phone)}</div></div>
-            <i class="fas fa-arrow-right c-arrow"></i>
-          </a>
-          ${(liUrl||c.linkedin)?`<a href="${esc(liUrl||'#')}" class="c-item"${liUrl?' target="_blank" rel="noopener noreferrer"':' style="pointer-events:none;opacity:.4"'}>
-            <div class="c-ico" style="background:rgba(10,102,194,.1);color:#0a66c2"><i class="fab fa-linkedin-in"></i></div>
-            <div class="c-text"><div class="c-lbl">LinkedIn</div><div class="c-val">${esc(c.linkedin||c.linkedin_url)}</div></div>
-            <i class="fas fa-arrow-right c-arrow"></i>
-          </a>`:''}
-          ${(ghUrl||c.github)?`<a href="${esc(ghUrl||'#')}" class="c-item"${ghUrl?' target="_blank" rel="noopener noreferrer"':' style="pointer-events:none;opacity:.4"'}>
-            <div class="c-ico" style="background:rgba(255,255,255,.04);color:var(--text)"><i class="fab fa-github"></i></div>
-            <div class="c-text"><div class="c-lbl">GitHub</div><div class="c-val">${esc(c.github||c.github_url)}</div></div>
-            <i class="fas fa-arrow-right c-arrow"></i>
-          </a>`:''}${!(liUrl||c.linkedin)&&!(ghUrl||c.github)?`
-          <p style="color:var(--dim);font-size:.84rem;padding:.5rem 0">No social profiles added yet.</p>`:''}
-        </div>
+    <div class="rv" style="max-width:620px;margin:0 auto">
+      <div class="contact-left">
+        <h3>Let's build something<br>great together.</h3>
+        <p>Whether you have an internship opportunity, want to collaborate on a technical project, or just want to talk engineering — I'd love to hear from you.</p>
       </div>
-      <div class="form-box rv-r">
-        <h3>Send a Message</h3>
-        <form onsubmit="sendMsg(event)">
-          <div class="f-row">
-            <div class="fg"><label>Your Name</label><input type="text" placeholder="Jane Smith" required></div>
-            <div class="fg"><label>Email</label><input type="email" placeholder="jane@company.com" required></div>
-          </div>
-          <div class="fg"><label>Subject</label><input type="text" placeholder="Internship / Collaboration" required></div>
-          <div class="fg"><label>Message</label><textarea placeholder="Tell me about the opportunity..." required></textarea></div>
-          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;border-radius:9px">
-            <i class="fas fa-paper-plane"></i> Send Message
-          </button>
-        </form>
+      <div class="contact-list">
+        <a href="mailto:${esc(c.email)}" class="c-item">
+          <div class="c-ico" style="background:rgba(0,212,255,.1);color:var(--cyan)"><i class="fas fa-envelope"></i></div>
+          <div class="c-text"><div class="c-lbl">Email</div><div class="c-val">${esc(c.email)}</div></div>
+          <i class="fas fa-arrow-right c-arrow"></i>
+        </a>
+        <a href="tel:${esc(c.phone)}" class="c-item">
+          <div class="c-ico" style="background:rgba(255,107,53,.1);color:var(--orange)"><i class="fas fa-phone"></i></div>
+          <div class="c-text"><div class="c-lbl">Phone / WhatsApp</div><div class="c-val">${esc(c.phone)}</div></div>
+          <i class="fas fa-arrow-right c-arrow"></i>
+        </a>
+        ${(liUrl||c.linkedin)?`<a href="${esc(liUrl||'#')}" class="c-item"${liUrl?' target="_blank" rel="noopener noreferrer"':' style="pointer-events:none;opacity:.4"'}>
+          <div class="c-ico" style="background:rgba(10,102,194,.1);color:#0a66c2"><i class="fab fa-linkedin-in"></i></div>
+          <div class="c-text"><div class="c-lbl">LinkedIn</div><div class="c-val">${esc(c.linkedin||c.linkedin_url)}</div></div>
+          <i class="fas fa-arrow-right c-arrow"></i>
+        </a>`:''}
+        ${(ghUrl||c.github)?`<a href="${esc(ghUrl||'#')}" class="c-item"${ghUrl?' target="_blank" rel="noopener noreferrer"':' style="pointer-events:none;opacity:.4"'}>
+          <div class="c-ico" style="background:rgba(255,255,255,.04);color:var(--text)"><i class="fab fa-github"></i></div>
+          <div class="c-text"><div class="c-lbl">GitHub</div><div class="c-val">${esc(c.github||c.github_url)}</div></div>
+          <i class="fas fa-arrow-right c-arrow"></i>
+        </a>`:''}${!(liUrl||c.linkedin)&&!(ghUrl||c.github)?`
+        <p style="color:var(--dim);font-size:.84rem;padding:.5rem 0">No social profiles added yet.</p>`:''}
       </div>
     </div>
   </div></section>`;
@@ -731,7 +710,7 @@ function renderAll(d){
   buildNav(d);
   const html=[
     rHero(d), rStats(d), rAbout(d), rSkills(d), rProjects(d),
-    rTimeline(d.education,'education','edu-bg','// BACKGROUND','Education &amp;','Experience','The foundation behind the work'),
+    rTimeline(d.education,'education','edu-bg','// BACKGROUND','Education and','Experience','The foundation behind the work'),
     rCerts(d), rHonours(d), rPubs(d), rPatents(d),
     rTimeline(d.volunteer,'volunteer','vol-bg','// GIVING BACK','Volunteer','Experience','Contributing to the community beyond the classroom'),
     rServices(d), rBreak(d), rContact(d), rFooter(d),
@@ -810,15 +789,6 @@ function initAll(d){
       });
     },{threshold:0.5}).observe(sb);
   }
-}
-
-function sendMsg(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button');
-  const orig=btn.innerHTML;
-  btn.innerHTML='<i class="fas fa-check"></i> Message Sent!';
-  btn.style.background='linear-gradient(135deg,#22c55e,#16a34a)';
-  setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';e.target.reset();},3000);
 }
 
 /* ── boot ───────────────────────────────────────────────── */
