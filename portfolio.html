@@ -441,8 +441,9 @@ function rSkills(d){
 }
 
 function rProjects(d){
-  if(!(d.projects||[]).length) return '';
-  const cards=(d.projects||[]).map((p,i)=>`
+  const projects=(d.projects||[]).filter(p=>(p.title||'').trim());
+  if(!projects.length) return '';
+  const cards=projects.map((p,i)=>`
     <div class="proj-card rv d${Math.min(i+1,4)}">
       <div class="proj-img">
         <img src="${esc(p.image)}" alt="${esc(p.title)}">
@@ -474,8 +475,9 @@ function rProjects(d){
 }
 
 function rTimeline(items,id,secClass,tag,title,em,sub){
-  if(!(items||[]).length) return '';
-  const rows=items.map((it,i)=>`
+  const entries=(items||[]).filter(it=>(it.role||'').trim()||(it.org||'').trim());
+  if(!entries.length) return '';
+  const rows=entries.map((it,i)=>`
     <div class="tl-item rv d${Math.min(i+1,4)}">
       <div class="tl-dot" style="${DOT[it.dot]||DOT.cyan}"></div>
       <div class="tl-card">
@@ -493,8 +495,9 @@ function rTimeline(items,id,secClass,tag,title,em,sub){
 }
 
 function rCerts(d){
-  if(!(d.certifications||[]).length) return '';
-  const cards=d.certifications.map((c,i)=>`
+  const certs=(d.certifications||[]).filter(c=>(c.title||'').trim());
+  if(!certs.length) return '';
+  const cards=certs.map((c,i)=>`
     <div class="cert-card rv d${Math.min(i+1,4)}">
       <div class="cert-ico" style="${cIco(c.icon_bg)}"><i class="${esc(c.icon)}"></i></div>
       <div class="cert-info">
