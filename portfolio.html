@@ -324,9 +324,23 @@ function secHead(tag,title,em,sub){
   <div class="sec-bar"></div>${sub?`<p class="sec-sub">${esc(sub)}</p>`:''}</div>`;
 }
 
+/* ── url helper ─────────────────────────────────────────── */
+function extUrl(url,display){
+  const clean=s=>(s||'').trim();
+  const fix=s=>/^https?:\/\//i.test(s)?s:'https://'+s;
+  if(clean(url)) return fix(clean(url));
+  if(clean(display)&&clean(display).includes('.')) return fix(clean(display));
+  return null;
+}
+const xlink=(href,cls,attrs,inner)=>
+  href?`<a href="${esc(href)}" class="${cls}" ${attrs} target="_blank" rel="noopener noreferrer">${inner}</a>`
+     :`<a href="#" class="${cls}" style="pointer-events:none;opacity:.35">${inner}</a>`;
+
 /* ── section renderers ──────────────────────────────────── */
 function rHero(d){
   const p=d.profile,c=d.contact;
+  const liUrl=extUrl(c.linkedin_url,c.linkedin);
+  const ghUrl=extUrl(c.github_url,c.github);
   const chips=(p.chips||[]).map((ch,i)=>`
     <div class="float-chip chip-${i+1}">
       <div class="chip-icon" style="${cIco(ch.color)}"><i class="${esc(ch.icon)}"></i></div>
@@ -343,13 +357,12 @@ function rHero(d){
         <p class="hero-desc">${esc(p.tagline)}</p>
         <div class="hero-btns">
           <a href="#projects" class="btn btn-primary"><i class="fas fa-briefcase"></i> View Projects</a>
-          <a href="${esc(c.cv_url)}" class="btn btn-outline"><i class="fas fa-download"></i> Download CV</a>
+          ${c.cv_url?`<a href="${esc(c.cv_url)}" class="btn btn-outline" target="_blank" rel="noopener noreferrer"><i class="fas fa-download"></i> Download CV</a>`:''}
         </div>
         <div class="hero-socials">
-          <a href="${esc(c.github_url)}" class="soc" title="GitHub"><i class="fab fa-github"></i></a>
-          <a href="${esc(c.linkedin_url)}" class="soc" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-          <a href="mailto:${esc(c.email)}" class="soc" title="Email"><i class="fas fa-envelope"></i></a>
-          <a href="#" class="soc" title="Research"><i class="fas fa-flask"></i></a>
+          ${xlink(ghUrl,'soc','title="GitHub"','<i class="fab fa-github"></i>')}
+          ${xlink(liUrl,'soc','title="LinkedIn"','<i class="fab fa-linkedin-in"></i>')}
+          ${c.email?`<a href="mailto:${esc(c.email)}" class="soc" title="Email"><i class="fas fa-envelope"></i></a>`:''}
         </div>
       </div>
       <div class="hero-right">
@@ -588,6 +601,8 @@ function rBreak(d){
 
 function rContact(d){
   const c=d.contact||{},p=d.profile||{};
+  const liUrl=extUrl(c.linkedin_url,c.linkedin);
+  const ghUrl=extUrl(c.github_url,c.github);
   return `<section class="contact-bg" id="contact"><div class="wrap">
     ${secHead('// LET\'S CONNECT','Get In','Touch','Open to internships, research collaborations, and exciting engineering projects')}
     <div class="contact-grid">
@@ -607,16 +622,17 @@ function rContact(d){
             <div class="c-text"><div class="c-lbl">Phone / WhatsApp</div><div class="c-val">${esc(c.phone)}</div></div>
             <i class="fas fa-arrow-right c-arrow"></i>
           </a>
-          <a href="${esc(c.linkedin_url)}" class="c-item">
+          ${(liUrl||c.linkedin)?`<a href="${esc(liUrl||'#')}" class="c-item"${liUrl?' target="_blank" rel="noopener noreferrer"':' style="pointer-events:none;opacity:.4"'}>
             <div class="c-ico" style="background:rgba(10,102,194,.1);color:#0a66c2"><i class="fab fa-linkedin-in"></i></div>
-            <div class="c-text"><div class="c-lbl">LinkedIn</div><div class="c-val">${esc(c.linkedin)}</div></div>
+            <div class="c-text"><div class="c-lbl">LinkedIn</div><div class="c-val">${esc(c.linkedin||c.linkedin_url)}</div></div>
             <i class="fas fa-arrow-right c-arrow"></i>
-          </a>
-          <a href="${esc(c.github_url)}" class="c-item">
+          </a>`:''}
+          ${(ghUrl||c.github)?`<a href="${esc(ghUrl||'#')}" class="c-item"${ghUrl?' target="_blank" rel="noopener noreferrer"':' style="pointer-events:none;opacity:.4"'}>
             <div class="c-ico" style="background:rgba(255,255,255,.04);color:var(--text)"><i class="fab fa-github"></i></div>
-            <div class="c-text"><div class="c-lbl">GitHub</div><div class="c-val">${esc(c.github)}</div></div>
+            <div class="c-text"><div class="c-lbl">GitHub</div><div class="c-val">${esc(c.github||c.github_url)}</div></div>
             <i class="fas fa-arrow-right c-arrow"></i>
-          </a>
+          </a>`:''}${!(liUrl||c.linkedin)&&!(ghUrl||c.github)?`
+          <p style="color:var(--dim);font-size:.84rem;padding:.5rem 0">No social profiles added yet.</p>`:''}
         </div>
       </div>
       <div class="form-box rv-r">
@@ -697,7 +713,7 @@ function buildNav(d){
   links.push(['#contact','Contact']);
   document.getElementById('nav-links').innerHTML=
     links.map(([h,l])=>`<li><a href="${h}">${l}</a></li>`).join('')+
-    `<li><a href="${esc(c.cv_url)}" class="nav-cta"><i class="fas fa-download" style="font-size:.8rem"></i> Resume</a></li>`;
+    `<li><a href="${esc(c.cv_url||'#')}" class="nav-cta"${c.cv_url?' target="_blank" rel="noopener noreferrer"':''}><i class="fas fa-download" style="font-size:.8rem"></i> Resume</a></li>`;
   document.getElementById('mobNav').innerHTML=
     links.map(([h,l])=>`<a href="${h}" class="mob-link">${l}</a>`).join('');
 }
