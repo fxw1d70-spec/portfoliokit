@@ -320,10 +320,15 @@ function secHead(tag,title,em,sub){
 /* ── url helper ─────────────────────────────────────────── */
 function extUrl(url,display){
   const clean=s=>(s||'').trim();
-  const fix=s=>/^https?:\/\//i.test(s)?s:'https://'+s;
-  if(clean(url)) return fix(clean(url));
-  if(clean(display)&&clean(display).includes('.')) return fix(clean(display));
-  return null;
+  const toUrl=s=>{
+    if(!s) return null;
+    const u=/^https?:\/\//i.test(s)?s:'https://'+s;
+    try{
+      const h=new URL(u).hostname;
+      return h.includes('.')&&h.split('.').pop().length>=2?u:null;
+    }catch(e){return null;}
+  };
+  return toUrl(clean(url))||toUrl(clean(display))||null;
 }
 const xlink=(href,cls,attrs,inner)=>
   href?`<a href="${esc(href)}" class="${cls}" ${attrs} target="_blank" rel="noopener noreferrer">${inner}</a>`
